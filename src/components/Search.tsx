@@ -1,7 +1,9 @@
 import { useState } from 'react';
+// import { useDebounce } from '../hooks/useDebounce';
 
 export function Search() {
     const [searchTerm, setSearchTerm] = useState('');
+    // const debounceSearch = useDebounce(searchTerm, 500);
 
     return (
         <div className="relative w-96">
