@@ -4,14 +4,14 @@ import { type Feedback } from '../interfaces/Feedback';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { StarIcon } from '../components/icons/StarIcon';
 
-export function Table() {
+export function Table({ searchTerm }: { searchTerm: string }) {
     // const [page, setPage] = useState(0);
     // const pageSize = 10;
 
     const queryParams = {
         skip: 0, // page * pageSize,
-        take: 5, // pageSize,
-        search: 'н',
+        take: 30, // pageSize,
+        search: searchTerm,
         sortBy: FeedbackSort.NEWEST,
     };
 
