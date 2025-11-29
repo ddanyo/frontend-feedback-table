@@ -2,12 +2,12 @@ import { useQuery } from '@tanstack/react-query';
 import { getFeedbacks } from '../api/feedbacks';
 import { type Feedback } from '../interfaces/Feedback';
 import { FeedbackSort } from '../constans/FeedbackSort';
+import { StarIcon } from '../components/icons/StarIcon';
 
 export function Table() {
     // const [page, setPage] = useState(0);
     // const pageSize = 10;
 
-    // Вычисляем параметры
     const queryParams = {
         skip: 0, // page * pageSize,
         take: 5, // pageSize,
@@ -20,19 +20,43 @@ export function Table() {
         queryFn: () => getFeedbacks(queryParams),
     });
 
-    if (getFeedbacksQuery.isLoading) return <span className="text-2xl">Loading...</span>;
+    if (getFeedbacksQuery.isLoading) {
+        return (
+            <div className="flex justify-center text-xl text-slate-500 font-medium animate-pulse mt-20">
+                Загрузка данных...
+            </div>
+        );
+    }
     if (getFeedbacksQuery.isError)
-        return <span className="text-2xl text-red-500">{getFeedbacksQuery.error.message}</span>;
+        return (
+            <div className="flex justify-center text-xl text-red-500 font-medium mt-20">
+                {getFeedbacksQuery.error.message}
+            </div>
+        );
     if (!getFeedbacksQuery.data || getFeedbacksQuery.data.length === 0) {
-        return <span className="text-2xl">Нет данных для отображения.</span>;
+        return (
+            <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
+                Нет данных для отображения...
+            </div>
+        );
     }
 
     const feedbackList = getFeedbacksQuery.data;
+    const formatClockString = (date: Date): string => {
+        return new Intl.DateTimeFormat('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            day: '2-digit',
+            month: '2-digit',
+            weekday: 'long',
+        }).format(date);
+    };
 
     return (
-        <div className="border border-slate-200 rounded-lg overflow-hidden">
-            <table className="min-w-full divide-y divide-slate-200">
-                <thead className="bg-slate-50">
+        <div className="flex flex-col max-h-full overflow-y-auto min-h-0 border border-slate-200 rounded-lg bg-white">
+            <table className="w-full divide-y divide-slate-200 relative">
+                <thead className="bg-slate-100 table-fixed sticky top-0 z-10 shadow-sm">
                     <tr>
                         <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">
                             ID
@@ -50,18 +74,22 @@ export function Table() {
                 </thead>
                 <tbody className="bg-white divide-y divide-slate-200">
                     {feedbackList.map((item) => (
-                        <tr key={item.id} className="hover:bg-slate-50">
+                        <tr key={item.id} className="hover:bg-slate-100">
                             <td className="px-6 py-4 text-sm text-slate-500">#{item.id}</td>
                             <td className="px-6 py-4">
-                                <span className="text-lg text-yellow-500">
-                                    {item.rating >= 4 ? '★' : '☆'}
-                                    <span className="text-sm text-slate-600 ml-2">
-                                        ({item.rating})
+                                <span
+                                    className={`flex items-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                >
+                                    <StarIcon className="w-5 h-5" />
+                                    <span className="text-sm  text-slate-500 font-medium ml-2">
+                                        {item.rating}
                                     </span>
                                 </span>
                             </td>
-                            <td className="px-6 py-4 text-sm text-slate-500">{item.date_time}</td>
-                            <td className="px-6 py-4 text-sm text-slate-700">
+                            <td className="px-6 py-4 text-sm text-slate-500">
+                                {formatClockString(new Date(item.date_time))}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-600 font-medium">
                                 {item.feedback_text}
                             </td>
                         </tr>

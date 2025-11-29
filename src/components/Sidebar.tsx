@@ -11,7 +11,7 @@ export function Sidebar() {
     useEffect(() => {}, [settings]);
 
     return (
-        <aside className="w-64 bg-slate-50 border-r border-slate-200 p-6 overflow-y-auto">
+        <aside className="w-64 bg-slate-50 border-r-3 border-slate-200 p-6 h-full overflow-y-auto">
             <div className="flex items-center gap-2 text-slate-500 mb-6 text-md font-bold tracking-wider">
                 <span>⚙️</span>
                 Settings

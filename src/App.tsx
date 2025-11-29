@@ -4,16 +4,13 @@ import { Table } from './components/Table';
 
 function App() {
     return (
-        <div className="min-h-screen flex flex-col bg-white text-slate-900 font-sans">
+        <div className="h-screen w-full bg-slate-200 flex flex-col overflow-hidden">
             <Header />
 
-            <div className="flex flex-1 overflow-hidden h-[calc(100vh-64px)]">
+            <div className="flex flex-1 overflow-hidden">
                 <Sidebar />
-
-                <main className="flex-1 overflow-y-auto bg-white p-8">
-                    <div className="mb-6">
-                        <h1 className="text-2xl font-bold text-slate-800">Отзывы</h1>
-                    </div>
+                <main className="flex flex-col flex-1 bg-white p-8 overflow-hidden">
+                    <h1 className="text-3xl font-bold text-slate-800 mb-6 shrink-0">Отзывы</h1>
                     <Table />
                 </main>
             </div>
