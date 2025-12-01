@@ -45,7 +45,7 @@ export function Sidebar({
 
     return (
         <aside className="flex flex-col w-64 bg-slate-50 border-r-3 border-slate-200 p-5 h-full overflow-y-auto">
-            <div className="flex items-center gap-2 text-slate-500 mb-4 text-md font-bold tracking-wider">
+            <div className="flex items-center gap-2 text-slate-500 mb-4 text-md font-bold">
                 <span>⚙️</span>
                 Settings
             </div>
@@ -91,7 +91,7 @@ export function Sidebar({
                 </div>
             </div>
 
-            <div className="flex flex-col items-center  h-40 rounded-lg p-2">
+            <div className="flex flex-col items-center h-40 rounded-lg p-2">
                 <span className="text-slate-700 text-sm font-medium">
                     Число записей на странице:
                 </span>

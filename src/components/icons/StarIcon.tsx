@@ -1,4 +1,4 @@
-export function StarIcon({ className }: { className?: string }) {
+export function StarIcon({ className }: { className: string }) {
     return (
         <svg
             viewBox="0 0 32 32"

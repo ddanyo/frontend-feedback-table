@@ -86,7 +86,7 @@ export function Table({
                                     className={`flex items-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
                                 >
                                     <StarIcon className="w-5 h-5" />
-                                    <span className="text-sm  text-slate-500 font-medium ml-2">
+                                    <span className="text-sm text-slate-500 font-medium ml-2">
                                         {item.rating}
                                     </span>
                                 </span>

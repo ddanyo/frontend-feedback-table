@@ -47,6 +47,10 @@ body {
     ::-webkit-scrollbar {
         display: none;
     }
+
+    html {
+        scrollbar-width: none;
+    }
 }
 
 @layer utilities {
@@ -54,5 +58,10 @@ body {
     .no-spinner::-webkit-inner-spin-button {
         -webkit-appearance: none;
         margin: 0;
+    }
+
+    .no-spinner {
+        -moz-appearance: none;
+        appearance: none;
     }
 }

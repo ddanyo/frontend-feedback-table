@@ -13,7 +13,7 @@ export function Header({
                 </div>
                 <span>Monitoring</span>
             </div>
-            <div className="relative w-96">
+            <div className="w-96">
                 <input
                     type="text"
                     placeholder="Поиск..."
