@@ -14,3 +14,15 @@ export function useDebounce(value: string, delay: number = 500) {
     }, [value, delay]);
     return debouncedValue;
 }
+
+export function useDebounceNew(func: () => void, delay: number = 500) {
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            func();
+        }, delay);
+
+        return () => {
+            clearTimeout(timeoutId);
+        };
+    }, [func, delay]);
+}

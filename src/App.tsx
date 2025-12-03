@@ -29,7 +29,12 @@ function App() {
                 />
                 <main className="flex flex-col flex-1 bg-white px-6 py-5">
                     <h1 className="text-3xl font-bold text-slate-800 mb-4">Отзывы</h1>
-                    <Table searchTerm={debounceSearch} page={page} pageSize={pageSize} />
+                    <Table
+                        searchTerm={debounceSearch}
+                        page={page}
+                        pageSize={pageSize}
+                        settings={settings}
+                    />
                 </main>
             </div>
         </div>

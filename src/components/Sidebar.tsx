@@ -42,6 +42,13 @@ export function Sidebar({
             onPageSizeChange(pageSize + 10);
         }
     }
+    // function handleTanstacktable() {
+    //     onSettingsChange({
+    //         ...settings,
+    //         tanstackTable: !settings.tanstackTable,
+    //     });
+    //     console.log('settings изменились: ', settings);
+    // }
 
     return (
         <aside className="flex flex-col w-64 bg-slate-50 border-r-3 border-slate-200 p-5 h-full overflow-y-auto">
@@ -55,12 +62,13 @@ export function Sidebar({
                     <span className="text-sm font-medium text-slate-700">TanStack Table</span>
                     <Switcher
                         enabled={settings.tanstackTable}
-                        onChange={() =>
+                        onChange={() => {
                             onSettingsChange({
                                 ...settings,
                                 tanstackTable: !settings.tanstackTable,
-                            })
-                        }
+                            });
+                            console.log('Изменились настройки: ', settings);
+                        }}
                     />
                 </div>
 
@@ -118,7 +126,7 @@ export function Sidebar({
                     <button
                         onClick={handlePrevPage}
                         disabled={page === 1}
-                        className="flex items-center justify-center text-slate-700 text-3xl bg-blue-500 w-12 h-7 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed pb-1"
+                        className="flex items-center justify-center text-slate-700 text-3xl bg-blue-400 w-12 h-7 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed pb-1"
                     >
                         {'<'}
                     </button>
@@ -139,7 +147,7 @@ export function Sidebar({
                     />
                     <button
                         onClick={handleNextPage}
-                        className="flex items-center justify-center text-slate-700 text-3xl bg-blue-500 w-12 h-7 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed pb-1 no-spinner"
+                        className="flex items-center justify-center text-slate-700 text-3xl bg-blue-400 w-12 h-7 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed pb-1 no-spinner"
                     >
                         {'>'}
                     </button>
