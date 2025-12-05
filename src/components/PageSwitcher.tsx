@@ -72,7 +72,7 @@ export function PageSwitcher({
             <button
                 onClick={handlePrevPage}
                 disabled={pageSettings.page === 1}
-                className="flex items-center justify-center text-slate-700 text-2xl bg-blue-400 w-12 h-7.5 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center justify-center text-slate-700 text-2xl bg-blue-500 w-12 h-7.5 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -105,7 +105,7 @@ export function PageSwitcher({
                 className="w-14 h-7 text-center text-slate-700 bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-blue-500 no-spinner"
             />
             <button
-                className="flex items-center justify-center text-slate-700 text-3xl bg-blue-400 w-12 h-7.5 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
+                className="flex items-center justify-center text-slate-700 text-3xl bg-blue-500 w-12 h-7.5 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
                 onClick={handleNextPage}
                 disabled={pageSettings.page === pageSettings.countPages}
             >

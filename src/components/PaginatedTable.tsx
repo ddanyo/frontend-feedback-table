@@ -83,7 +83,7 @@ export function PaginatedTable({
             {settings.tanstackTable ? (
                 <TanstackTable data={feedbackList} />
             ) : (
-                <NativeTable data={feedbackList} />
+                <NativeTable data={feedbackList} searchTerm={searchTerm} />
             )}
         </div>
     );

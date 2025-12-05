@@ -6,8 +6,10 @@ export function Header({
     onSearchTermChange: (newTerm: string) => void;
 }) {
     return (
-        <header className="h-22 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">
-            <h1 className="text-4xl font-bold text-slate-800 m-4">Отзывы</h1>
+        <header className="h-24 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">
+            <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-blue-800 via-blue-600 to-blue-400 m-4 pb-1">
+                Отзывы
+            </h1>
             <div className="w-100 pr-8">
                 <input
                     type="text"

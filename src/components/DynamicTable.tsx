@@ -93,7 +93,11 @@ export function DynamicTable({ searchTerm, pageSize, useTanstackTable }: Props) 
 
     return (
         <>
-            {useTanstackTable ? <TanstackTable data={items} /> : <NativeTable data={items} />}
+            {useTanstackTable ? (
+                <TanstackTable data={items} />
+            ) : (
+                <NativeTable data={items} searchTerm={searchTerm} />
+            )}
 
             <div ref={observerTarget} className="h-8 flex justify-center items-center w-full mt-2">
                 {isLoading && (

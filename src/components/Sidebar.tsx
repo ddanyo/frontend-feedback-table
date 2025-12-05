@@ -101,7 +101,7 @@ export function Sidebar({
     };
 
     return (
-        <aside className="flex flex-col w-64 bg-slate-50 border-r-3 border-slate-200 p-5 h-full overflow-y-auto">
+        <aside className="flex flex-col w-70 bg-slate-50 border-r-3 border-slate-200 p-5 h-full overflow-y-auto">
             <div className="flex items-center gap-2 text-slate-500 mb-4 text-lg font-bold">
                 <span>⚙️</span>
                 Settings
@@ -179,7 +179,7 @@ export function Sidebar({
             </div>
 
             {!settings.dynamicMode ? (
-                <div className="flex flex-col items-center justify-center h-30 rounded-lg p-3 gap-1 border-2 border-slate-300 transition">
+                <div className="flex flex-col items-center justify-center h-30 rounded-lg p-3 gap-1 border-3 border-dashed border-slate-300 mb-10">
                     <span className="text-slate-700 text-base font-medium">
                         Число записей на странице:
                     </span>

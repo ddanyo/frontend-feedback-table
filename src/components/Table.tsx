@@ -28,36 +28,28 @@ export function Table({
 }) {
     if (settings.dynamicMode) {
         if (settings.tanstackVirtual) {
-            return (
-                <div className="flex flex-col h-full overflow-hidden border border-slate-200 rounded-lg bg-white">
-                    <VirtualTable searchTerm={searchTerm} pageSize={pageSettings.pageSize} />
-                </div>
-            );
+            return <VirtualTable searchTerm={searchTerm} pageSize={pageSettings.pageSize} />;
         }
 
         return (
-            <div className="flex flex-col h-full overflow-hidden border border-slate-200 rounded-lg bg-white">
-                <div className="flex-1 overflow-y-auto min-h-0">
-                    <DynamicTable
-                        searchTerm={searchTerm}
-                        pageSize={pageSettings.pageSize}
-                        useTanstackTable={settings.tanstackTable}
-                    />
-                </div>
+            <div className="overflow-y-auto min-h-0">
+                <DynamicTable
+                    searchTerm={searchTerm}
+                    pageSize={pageSettings.pageSize}
+                    useTanstackTable={settings.tanstackTable}
+                />
             </div>
         );
     }
 
     return (
-        <div className="flex flex-col h-full overflow-hidden border border-slate-200 rounded-lg bg-white">
-            <div className="overflow-y-auto min-h-0">
-                <PaginatedTable
-                    searchTerm={searchTerm}
-                    pageSettings={pageSettings}
-                    settings={settings}
-                    onPageSettingsChange={onPageSettingsChange}
-                />
-            </div>
+        <div className="overflow-y-auto min-h-0">
+            <PaginatedTable
+                searchTerm={searchTerm}
+                pageSettings={pageSettings}
+                settings={settings}
+                onPageSettingsChange={onPageSettingsChange}
+            />
         </div>
     );
 }

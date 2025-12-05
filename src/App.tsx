@@ -30,15 +30,17 @@ function App() {
                     pageSettings={pageSettings}
                     onPageSettingsChange={setPageSettings}
                 />
-                <main className="flex flex-col flex-1 bg-white px-6 py-4">
-                    <Table
-                        searchTerm={debounceSearch}
-                        settings={settings}
-                        pageSettings={pageSettings}
-                        onPageSettingsChange={setPageSettings}
-                    />
+                <main className="flex flex-col items-center flex-1 bg-white px-6 pt-8 pb-6">
+                    <div className="flex flex-col items-center h-full w-3/4 overflow-hidden border border-slate-200 rounded-lg bg-white">
+                        <Table
+                            searchTerm={debounceSearch}
+                            settings={settings}
+                            pageSettings={pageSettings}
+                            onPageSettingsChange={setPageSettings}
+                        />
+                    </div>
                     {!settings.dynamicMode ? (
-                        <div className="flex flex-col justify-center items-center h-8 rounded-lg p-1 gap-1 mt-2">
+                        <div className="flex flex-col justify-center items-center h-8 rounded-lg pt-2 gap-1 mt-2">
                             <PageSwitcher
                                 pageSettings={pageSettings}
                                 onPageSettingsChange={setPageSettings}

@@ -1,7 +1,8 @@
 import { StarIcon } from '../components/icons/StarIcon';
 import { type Feedback } from '../interfaces/Feedback';
+import { getHighlightedText } from '../utils/highlight';
 
-export function NativeTable({ data }: { data: Feedback[] }) {
+export function NativeTable({ data, searchTerm }: { data: Feedback[]; searchTerm: string }) {
     const formatClockString = (date: Date): string => {
         return new Intl.DateTimeFormat('ru-RU', {
             hour: '2-digit',
@@ -48,7 +49,7 @@ export function NativeTable({ data }: { data: Feedback[] }) {
                             {formatClockString(new Date(item.date_time))}
                         </td>
                         <td className="px-4 py-4 text-sm text-slate-600 font-medium w-1/2">
-                            {item.feedback_text}
+                            {getHighlightedText(item.feedback_text, searchTerm)}
                         </td>
                     </tr>
                 ))}
