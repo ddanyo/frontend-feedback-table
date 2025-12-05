@@ -15,3 +15,9 @@ export interface GetFeedbacksParams {
     search?: string;
     sortBy?: FeedbackSort;
 }
+
+export interface FeedbackResponse {
+    items: Feedback[];
+    total: number;
+    totalPages: number;
+}
