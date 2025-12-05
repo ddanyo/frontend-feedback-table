@@ -42,7 +42,6 @@ export function Sidebar({
     }, [pageSettings.page]);
 
     const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
-
     useEffect(() => {
         const newSizeStr = pageSettings.pageSize.toString();
 
@@ -51,6 +50,8 @@ export function Sidebar({
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageSettings.pageSize]);
+
+    const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
         if (pageSettings.pageSize >= 10) {
@@ -101,122 +102,187 @@ export function Sidebar({
     };
 
     return (
-        <aside className="flex flex-col w-70 bg-slate-50 border-r-3 border-slate-200 p-5 h-full overflow-y-auto">
-            <div className="flex items-center gap-2 text-slate-500 mb-4 text-lg font-bold">
-                <span>⚙️</span>
-                Settings
-            </div>
-
-            <div className="flex flex-col flex-1 gap-1.5">
-                <span className="text-sm font-medium text-slate-500">Режим таблицы</span>
+        <aside
+            className={`
+                flex flex-col items-center h-[90%] mt-6 ml-4
+                transition-all duration-300 ease-in-out relative overflow-hidden
+                ${isOpen ? 'w-80 bg-slate-50 border-3 border-slate-200 rounded-xl' : 'w-20 bg-white'}
+            `}
+        >
+            <div className="flex flex-col flex-1">
                 <div
-                    className={`flex items-center justify-between transition ${settings.tanstackVirtual ? 'opacity-40 pointer-events-none' : ''}`}
+                    className={`
+                    absolute top-4 left-0 w-full flex justify-center 
+                    transition-opacity duration-200 
+                    ${!isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
+                `}
                 >
-                    <span className="text-base font-medium text-slate-700 pl-3">
-                        TanStack Table
-                    </span>
-                    <Switcher
-                        enabled={settings.tanstackTable}
-                        onChange={() => {
-                            onSettingsChange({
-                                ...settings,
-                                tanstackTable: !settings.tanstackTable,
-                            });
-                            console.log('Изменились настройки: ', settings);
-                        }}
-                    />
-                </div>
-
-                <span className="text-sm font-medium text-slate-500 mt-4">
-                    Динамическая таблица
-                </span>
-                <div className="flex items-center justify-between pl-3">
-                    <span className="text-base font-medium text-slate-700">Dynamic Mode</span>
-                    <Switcher
-                        enabled={settings.dynamicMode}
-                        onChange={() => {
-                            const isDynamicMode = !settings.dynamicMode;
-                            onSettingsChange({
-                                ...settings,
-                                dynamicMode: isDynamicMode,
-                                tanstackVirtual: isDynamicMode ? settings.tanstackVirtual : false,
-                            });
-                            console.log('Изменились настройки: ', settings);
-                        }}
-                    />
+                    <button
+                        onClick={() => setIsOpen(true)}
+                        className="p-2 rounded-xl bg-slate-200 text-xl cursor-pointer transition hover:bg-slate-300"
+                        title="Открыть настройки"
+                    >
+                        ⚙️
+                    </button>
                 </div>
 
                 <div
-                    className={`flex items-center justify-between transition ${!settings.dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
+                    className={`
+                    flex flex-col h-full p-5 w-80 min-w-[300px]
+                    transition-opacity duration-200 
+                    ${isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
+                `}
                 >
-                    <span className="text-base font-medium text-slate-700 pl-3">
-                        TanStack Virtual
-                    </span>
-                    <Switcher
-                        enabled={settings.tanstackVirtual}
-                        onChange={() =>
-                            onSettingsChange({
-                                ...settings,
-                                tanstackVirtual: !settings.tanstackVirtual,
-                            })
-                        }
-                    />
-                </div>
-
-                <span className="text-sm font-medium text-slate-500 mt-4">Режим подгрузки</span>
-                <div className="flex items-center justify-between">
-                    <span className="text-base font-medium text-slate-700 pl-3">Zustand</span>
-                    <Switcher
-                        enabled={settings.zustand}
-                        onChange={() =>
-                            onSettingsChange({
-                                ...settings,
-                                zustand: !settings.zustand,
-                            })
-                        }
-                    />
-                </div>
-            </div>
-
-            {!settings.dynamicMode ? (
-                <div className="flex flex-col items-center justify-center h-30 rounded-lg p-3 gap-1 border-3 border-dashed border-slate-300 mb-10">
-                    <span className="text-slate-700 text-base font-medium">
-                        Число записей на странице:
-                    </span>
-
-                    <div className="flex items-center justify-center gap-2 bg-none h-1/2 w-full rounded-lg">
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-slate-500 text-xl font-bold ml-1">
+                            <span>⚙️</span>
+                            <span>Настройки</span>
+                        </div>
                         <button
-                            onClick={handleDecreasePageSize}
-                            disabled={pageSettings.pageSize === 5}
-                            className="text-blue-500 text-4xl pb-2 pr-1 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            onClick={() => setIsOpen(false)}
+                            className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                         >
-                            –
-                        </button>
-                        <input
-                            type="number"
-                            min={5}
-                            max={100}
-                            value={localPageSize}
-                            onChange={handlePageSizeChange}
-                            onBlur={handlePageSizeBlur}
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                    handlePageSizeBlur();
-                                    (e.target as HTMLInputElement).blur();
-                                }
-                            }}
-                            className="w-14 h-7 text-center text-slate-700 bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-blue-500 no-spinner"
-                        />
-                        <button
-                            onClick={handleIncreasePageSize}
-                            disabled={pageSettings.pageSize === 100}
-                            className="text-blue-500 text-4xl pb-2 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            +
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={2}
+                                stroke="currentColor"
+                                className="w-6 h-6"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
                         </button>
                     </div>
+
+                    <div className="flex-1 overflow-y-auto pr-2">
+                        <div className="flex flex-col gap-1.5">
+                            <span className="text-sm font-medium text-slate-500">
+                                Режим таблицы
+                            </span>
+                            <div
+                                className={`flex items-center justify-between transition ${settings.tanstackVirtual ? 'opacity-40 pointer-events-none' : ''}`}
+                            >
+                                <span className="text-base font-medium text-slate-700 pl-3">
+                                    TanStack Table
+                                </span>
+                                <Switcher
+                                    enabled={settings.tanstackTable}
+                                    onChange={() => {
+                                        onSettingsChange({
+                                            ...settings,
+                                            tanstackTable: !settings.tanstackTable,
+                                        });
+                                        console.log('Изменились настройки: ', settings);
+                                    }}
+                                />
+                            </div>
+
+                            <span className="text-sm font-medium text-slate-500 mt-4">
+                                Динамическая таблица
+                            </span>
+                            <div className="flex items-center justify-between pl-3">
+                                <span className="text-base font-medium text-slate-700">
+                                    Dynamic Mode
+                                </span>
+                                <Switcher
+                                    enabled={settings.dynamicMode}
+                                    onChange={() => {
+                                        const isDynamicMode = !settings.dynamicMode;
+                                        onSettingsChange({
+                                            ...settings,
+                                            dynamicMode: isDynamicMode,
+                                            tanstackVirtual: isDynamicMode
+                                                ? settings.tanstackVirtual
+                                                : false,
+                                        });
+                                        console.log('Изменились настройки: ', settings);
+                                    }}
+                                />
+                            </div>
+
+                            <div
+                                className={`flex items-center justify-between transition ${!settings.dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
+                            >
+                                <span className="text-base font-medium text-slate-700 pl-3">
+                                    TanStack Virtual
+                                </span>
+                                <Switcher
+                                    enabled={settings.tanstackVirtual}
+                                    onChange={() =>
+                                        onSettingsChange({
+                                            ...settings,
+                                            tanstackVirtual: !settings.tanstackVirtual,
+                                        })
+                                    }
+                                />
+                            </div>
+
+                            <span className="text-sm font-medium text-slate-500 mt-4">
+                                Режим подгрузки
+                            </span>
+                            <div className="flex items-center justify-between">
+                                <span className="text-base font-medium text-slate-700 pl-3">
+                                    Zustand
+                                </span>
+                                <Switcher
+                                    enabled={settings.zustand}
+                                    onChange={() =>
+                                        onSettingsChange({
+                                            ...settings,
+                                            zustand: !settings.zustand,
+                                        })
+                                    }
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {!settings.dynamicMode ? (
+                        <div className="flex flex-col items-center justify-center h-30 rounded-lg p-3 gap-1 border-3 border-dashed border-slate-300 mb-4 mt-20">
+                            <span className="text-slate-700 text-base font-medium">
+                                Число записей на странице:
+                            </span>
+
+                            <div className="flex items-center justify-center gap-2 bg-none h-1/2 w-full rounded-lg">
+                                <button
+                                    onClick={handleDecreasePageSize}
+                                    disabled={pageSettings.pageSize === 5}
+                                    className="text-blue-500 text-4xl pb-2 pr-1 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    –
+                                </button>
+                                <input
+                                    type="number"
+                                    min={5}
+                                    max={100}
+                                    value={localPageSize}
+                                    onChange={handlePageSizeChange}
+                                    onBlur={handlePageSizeBlur}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handlePageSizeBlur();
+                                            (e.target as HTMLInputElement).blur();
+                                        }
+                                    }}
+                                    className="w-14 h-7 text-center text-slate-700 bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-blue-500 no-spinner"
+                                />
+                                <button
+                                    onClick={handleIncreasePageSize}
+                                    disabled={pageSettings.pageSize === 100}
+                                    className="text-blue-500 text-4xl pb-2 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                    ) : null}
                 </div>
-            ) : null}
+            </div>
         </aside>
     );
 }

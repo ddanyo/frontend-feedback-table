@@ -21,7 +21,7 @@ function App() {
     });
 
     return (
-        <div className="h-screen w-full bg-slate-200 flex flex-col">
+        <div className="h-screen w-full bg-white flex flex-col">
             <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
             <div className="flex flex-1 overflow-hidden">
                 <Sidebar
@@ -31,7 +31,7 @@ function App() {
                     onPageSettingsChange={setPageSettings}
                 />
                 <main className="flex flex-col items-center flex-1 bg-white px-6 pt-8 pb-6">
-                    <div className="flex flex-col items-center h-full w-3/4 overflow-hidden border border-slate-200 rounded-lg bg-white">
+                    <div className="flex flex-col items-center max-h-full w-3/4 overflow-hidden border-2 border-slate-200 rounded-lg bg-white">
                         <Table
                             searchTerm={debounceSearch}
                             settings={settings}
