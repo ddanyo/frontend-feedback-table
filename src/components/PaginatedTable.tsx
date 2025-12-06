@@ -5,6 +5,7 @@ import { FeedbackSort } from '../constans/FeedbackSort';
 import { type FeedbackResponse } from '../interfaces/Feedback';
 import { NativeTable } from './NativeTable';
 import { TanstackTable } from './TanstackTable';
+import { PageSwitcher } from './PageSwitcher';
 
 export function PaginatedTable({
     searchTerm,
@@ -79,12 +80,21 @@ export function PaginatedTable({
     }
 
     return (
-        <div className="flex flex-col max-h-full overflow-y-auto min-h-0 border border-slate-200 rounded-lg bg-white">
-            {settings.tanstackTable ? (
-                <TanstackTable data={feedbackList} />
-            ) : (
-                <NativeTable data={feedbackList} searchTerm={searchTerm} />
-            )}
+        <div className="flex flex-col h-full gap-2">
+            <div className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
+                {settings.tanstackTable ? (
+                    <TanstackTable data={feedbackList} />
+                ) : (
+                    <NativeTable data={feedbackList} searchTerm={searchTerm} />
+                )}
+            </div>
+
+            <div className="h-6 py-4 mb-1">
+                <PageSwitcher
+                    pageSettings={pageSettings}
+                    onPageSettingsChange={onPageSettingsChange}
+                />
+            </div>
         </div>
     );
 }

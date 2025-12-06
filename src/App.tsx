@@ -3,7 +3,6 @@ import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
 import { useDebounce } from './hooks/useDebounce';
-import { PageSwitcher } from './components/PageSwitcher';
 
 function App() {
     const [searchTerm, setSearchTerm] = useState('');
@@ -23,15 +22,15 @@ function App() {
     return (
         <div className="h-screen w-full bg-white flex flex-col">
             <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden pb-6">
                 <Sidebar
                     settings={settings}
                     onSettingsChange={setSettings}
                     pageSettings={pageSettings}
                     onPageSettingsChange={setPageSettings}
                 />
-                <main className="flex flex-col items-center flex-1 bg-white px-6 pt-8 pb-6">
-                    <div className="flex flex-col items-center max-h-full w-3/4 overflow-hidden border-2 border-slate-200 rounded-lg bg-white">
+                <main className="flex flex-col items-center flex-1 px-6 pt-8">
+                    <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
                         <Table
                             searchTerm={debounceSearch}
                             settings={settings}
@@ -39,14 +38,6 @@ function App() {
                             onPageSettingsChange={setPageSettings}
                         />
                     </div>
-                    {!settings.dynamicMode ? (
-                        <div className="flex flex-col justify-center items-center h-8 rounded-lg pt-2 gap-1 mt-2">
-                            <PageSwitcher
-                                pageSettings={pageSettings}
-                                onPageSettingsChange={setPageSettings}
-                            />
-                        </div>
-                    ) : null}
                 </main>
             </div>
         </div>
