@@ -33,18 +33,15 @@ export function Sidebar({
     const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
     useEffect(() => {
         const newPageStr = pageSettings.page.toString();
-
         if (localPage !== newPageStr) {
             setLocalPage(newPageStr);
         }
-
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [pageSettings.page]);
 
     const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
     useEffect(() => {
         const newSizeStr = pageSettings.pageSize.toString();
-
         if (localPageSize !== newSizeStr) {
             setLocalPageSize(newSizeStr);
         }
@@ -73,11 +70,8 @@ export function Sidebar({
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setLocalPageSize(val);
-
         if (val === '') return;
-
         const numVal = parseInt(val, 10);
-
         if (!isNaN(numVal) && numVal >= 5 && numVal <= 100) {
             onPageSettingsChange({ ...pageSettings, pageSize: numVal });
         }
@@ -85,16 +79,13 @@ export function Sidebar({
 
     const handlePageSizeBlur = () => {
         let numVal = parseInt(localPageSize, 10);
-
         if (isNaN(numVal) || numVal < 5) {
             setLocalPageSize(pageSettings.pageSize.toString());
             return;
         }
-
         if (numVal > 100) {
             numVal = 100;
         }
-
         if (numVal !== pageSettings.pageSize) {
             onPageSettingsChange({ ...pageSettings, pageSize: numVal });
         }
@@ -104,16 +95,16 @@ export function Sidebar({
     return (
         <aside
             className={`
-                flex flex-col items-center h-[90%] mt-6 ml-4
-                transition-all duration-300 ease-in-out relative overflow-hidden
-                ${isOpen ? 'w-80 bg-slate-50 border-3 border-slate-200 rounded-xl' : 'w-20 bg-white'}
+                flex flex-col items-center h-[90%] mt-8 ml-4
+                transition-all duration-300 ease-in-out relative
+                ${isOpen ? 'w-80 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
             `}
         >
-            <div className="flex flex-col flex-1">
+            <div className="flex flex-col flex-1 w-full items-center mb-4 overflow-hidden">
                 <div
                     className={`
                     absolute top-4 left-0 w-full flex justify-center 
-                    transition-opacity duration-200 
+                    transition-opacity duration-200 z-10
                     ${!isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
                 `}
                 >
@@ -128,39 +119,41 @@ export function Sidebar({
 
                 <div
                     className={`
-                    flex flex-col h-full p-5 w-80 min-w-[300px]
+                    flex flex-col h-full w-80 min-w-[300px]
                     transition-opacity duration-200 
+                    /* ВАЖНО: overflow-y-auto перенесен СЮДА. Теперь скроллится весь контейнер целиком */
+                    overflow-y-auto overflow-x-hidden
                     ${isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
                 `}
                 >
-                    <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-2 text-slate-500 text-xl font-bold ml-1">
-                            <span>⚙️</span>
-                            <span>Настройки</span>
-                        </div>
-                        <button
-                            onClick={() => setIsOpen(false)}
-                            className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
-                        >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                strokeWidth={2}
-                                stroke="currentColor"
-                                className="w-6 h-6"
+                    <div className="flex flex-col min-h-full p-5">
+                        <div className="flex items-center justify-between mb-4">
+                            <div className="flex items-center gap-2 text-slate-500 text-xl font-bold ml-1">
+                                <span>⚙️</span>
+                                <span>Настройки</span>
+                            </div>
+                            <button
+                                onClick={() => setIsOpen(false)}
+                                className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                             >
-                                <path
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    d="M6 18L18 6M6 6l12 12"
-                                />
-                            </svg>
-                        </button>
-                    </div>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={2}
+                                    stroke="currentColor"
+                                    className="w-6 h-6"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
 
-                    <div className="flex-1 overflow-y-auto pr-2">
-                        <div className="flex flex-col gap-1.5">
+                        <div className="flex flex-col gap-1.5 mb-8">
                             <span className="text-sm font-medium text-slate-500">
                                 Режим таблицы
                             </span>
@@ -177,7 +170,6 @@ export function Sidebar({
                                             ...settings,
                                             tanstackTable: !settings.tanstackTable,
                                         });
-                                        console.log('Изменились настройки: ', settings);
                                     }}
                                 />
                             </div>
@@ -200,7 +192,6 @@ export function Sidebar({
                                                 ? settings.tanstackVirtual
                                                 : false,
                                         });
-                                        console.log('Изменились настройки: ', settings);
                                     }}
                                 />
                             </div>
@@ -240,47 +231,80 @@ export function Sidebar({
                                 />
                             </div>
                         </div>
-                    </div>
 
-                    {!settings.dynamicMode ? (
-                        <div className="flex flex-col items-center justify-center h-30 rounded-lg p-3 gap-1 border-3 border-dashed border-slate-300 mb-4 mt-20">
-                            <span className="text-slate-700 text-base font-medium">
-                                Число записей на странице:
-                            </span>
+                        {!settings.dynamicMode ? (
+                            <div
+                                className="
+                                flex flex-col items-center justify-center 
+                                w-full rounded-lg p-3 gap-2 
+                                border-2 border-dashed border-slate-300 
+                                mt-auto pt-4
+                            "
+                            >
+                                <span className="text-sm font-medium text-slate-500">
+                                    Число записей на странице:
+                                </span>
 
-                            <div className="flex items-center justify-center gap-2 bg-none h-1/2 w-full rounded-lg">
-                                <button
-                                    onClick={handleDecreasePageSize}
-                                    disabled={pageSettings.pageSize === 5}
-                                    className="text-blue-500 text-4xl pb-2 pr-1 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    –
-                                </button>
-                                <input
-                                    type="number"
-                                    min={5}
-                                    max={100}
-                                    value={localPageSize}
-                                    onChange={handlePageSizeChange}
-                                    onBlur={handlePageSizeBlur}
-                                    onKeyDown={(e) => {
-                                        if (e.key === 'Enter') {
-                                            handlePageSizeBlur();
-                                            (e.target as HTMLInputElement).blur();
-                                        }
-                                    }}
-                                    className="w-14 h-7 text-center text-slate-700 bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-blue-500 no-spinner"
-                                />
-                                <button
-                                    onClick={handleIncreasePageSize}
-                                    disabled={pageSettings.pageSize === 100}
-                                    className="text-blue-500 text-4xl pb-2 font-bold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    +
-                                </button>
+                                <div className="flex items-center justify-center gap-2 bg-none h-1/2 rounded-lg">
+                                    <button
+                                        onClick={handleDecreasePageSize}
+                                        disabled={pageSettings.pageSize === 5}
+                                        className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={2.5}
+                                            stroke="currentColor"
+                                            className="w-6 h-6"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M19.5 12h-15"
+                                            />
+                                        </svg>
+                                    </button>
+                                    <input
+                                        type="number"
+                                        min={5}
+                                        max={100}
+                                        value={localPageSize}
+                                        onChange={handlePageSizeChange}
+                                        onBlur={handlePageSizeBlur}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                handlePageSizeBlur();
+                                                (e.target as HTMLInputElement).blur();
+                                            }
+                                        }}
+                                        className="w-14 h-7 text-center text-slate-700 bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-blue-500 no-spinner"
+                                    />
+                                    <button
+                                        onClick={handleIncreasePageSize}
+                                        disabled={pageSettings.pageSize === 100}
+                                        className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            strokeWidth={2.5}
+                                            stroke="currentColor"
+                                            className="w-6 h-6"
+                                        >
+                                            <path
+                                                strokeLinecap="round"
+                                                strokeLinejoin="round"
+                                                d="M12 4.5v15m7.5-7.5h-15"
+                                            />
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    ) : null}
+                        ) : null}
+                    </div>
                 </div>
             </div>
         </aside>
