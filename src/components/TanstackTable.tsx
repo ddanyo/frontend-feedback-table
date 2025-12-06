@@ -9,7 +9,6 @@ import { type Feedback } from '../interfaces/Feedback';
 import { StarIcon } from '../components/icons/StarIcon';
 
 export function TanstackTable({ data }: { data: Feedback[] }) {
-    'use no memo';
     const formatClockString = (date: Date): string => {
         return new Intl.DateTimeFormat('ru-RU', {
             hour: '2-digit',
@@ -27,12 +26,12 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
         return [
             columnHelper.accessor('id', {
                 header: 'ID',
-                cell: (info) => `#${info.getValue()}`,
+                cell: (props) => `#${props.getValue()}`,
             }),
             columnHelper.accessor('rating', {
                 header: 'Рейтинг',
-                cell: (info) => {
-                    const rating = info.getValue();
+                cell: (props) => {
+                    const rating = props.getValue();
                     const colorClass =
                         rating === 5
                             ? 'text-green-500'
@@ -40,7 +39,7 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
                               ? 'text-red-500'
                               : 'text-yellow-500';
                     return (
-                        <span className={`flex items-center ${colorClass}`}>
+                        <span className={`flex items-center justify-center ${colorClass}`}>
                             <StarIcon className="w-5 h-5" />
                             <span className="text-sm text-slate-500 font-medium ml-2">
                                 {rating}
@@ -51,12 +50,12 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
             }),
             columnHelper.accessor('date_time', {
                 header: 'Дата',
-                cell: (info) => formatClockString(new Date(info.getValue())),
+                cell: (props) => formatClockString(new Date(props.getValue())),
             }),
             columnHelper.accessor('feedback_text', {
                 header: 'Текст отзыва',
-                cell: (info) => (
-                    <span className="text-slate-600 font-medium">{info.getValue()}</span>
+                cell: (props) => (
+                    <span className="text-slate-600 font-medium">{props.getValue()}</span>
                 ),
             }),
         ];
@@ -70,23 +69,22 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
     });
 
     return (
-        <table className="w-full divide-y divide-slate-200 relative">
-            <thead className="bg-blue-200 table-fixed sticky top-0 z-10 shadow-sm">
+        <table className="w-full divide-y divide-slate-100 relative table-fixed">
+            <thead className="bg-blue-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
                             <th
                                 key={header.id}
-                                className={`px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase ${
-                                    header.id === 'feedback_text' ? 'w-1/2' : ''
+                                className={`text-center text-sm font-medium text-slate-500 uppercase ${
+                                    header.id === 'feedback_text'
+                                        ? 'w-[60%]'
+                                        : header.id === 'date_time'
+                                          ? 'w-[20%]'
+                                          : 'w-[10%]'
                                 }`}
                             >
-                                {header.isPlaceholder
-                                    ? null
-                                    : flexRender(
-                                          header.column.columnDef.header,
-                                          header.getContext()
-                                      )}
+                                {flexRender(header.column.columnDef.header, header.getContext())}
                             </th>
                         ))}
                     </tr>
@@ -95,8 +93,11 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
             <tbody className="bg-white divide-y divide-slate-200">
                 {table.getRowModel().rows.map((row) => (
                     <tr key={row.id} className="hover:bg-slate-100">
-                        {row.getVisibleCells().map((cell) => (
-                            <td key={cell.id} className="px-6 py-4 text-sm text-slate-500">
+                        {row.getAllCells().map((cell) => (
+                            <td
+                                key={cell.id}
+                                className={`p-3 text-slate-500 ${cell.column.id === 'feedback_text' ? 'text-base text-slate-600 font-medium text-left' : 'text-center text-sm'}`}
+                            >
                                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
                             </td>
                         ))}

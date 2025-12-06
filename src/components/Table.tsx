@@ -32,7 +32,7 @@ export function Table({
         }
 
         return (
-            <div className="overflow-y-auto min-h-0">
+            <div className="overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg">
                 <DynamicTable
                     searchTerm={searchTerm}
                     pageSize={pageSettings.pageSize}
@@ -43,7 +43,7 @@ export function Table({
     }
 
     return (
-        <div className="overflow-y-auto min-h-0">
+        <div className="h-full">
             <PaginatedTable
                 searchTerm={searchTerm}
                 pageSettings={pageSettings}
