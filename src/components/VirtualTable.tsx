@@ -80,11 +80,11 @@ export function VirtualTable({ searchTerm, pageSize }: Props) {
 
     return (
         <div className="flex flex-col h-full w-full bg-white rounded-lg border border-slate-200 overflow-hidden">
-            <div className="grid grid-cols-12 bg-slate-100 border-b border-slate-200 shadow-sm text-xs font-medium text-slate-500 uppercase py-3 shrink-0 z-10">
-                <div className="col-span-1 px-4">ID</div>
-                <div className="col-span-2 px-4">Рейтинг</div>
-                <div className="col-span-3 px-4">Дата</div>
-                <div className="col-span-6 px-4">Текст отзыва</div>
+            <div className="grid grid-cols-12 h-12 bg-green-100 border-b border-slate-200 shadow-sm text-sm font-medium text-slate-500 uppercase py-3 shrink-0 z-10">
+                <div className="col-span-1 text-center">ID</div>
+                <div className="col-span-2 text-center">Рейтинг</div>
+                <div className="col-span-3 text-center">Дата</div>
+                <div className="col-span-6 text-center">Текст отзыва</div>
             </div>
 
             <div ref={parentRef} className="flex-1 w-full overflow-y-auto">
@@ -112,15 +112,17 @@ export function VirtualTable({ searchTerm, pageSize }: Props) {
                                 }}
                             >
                                 {isLoaderRow ? (
-                                    <span className="text-slate-400 py-2 animate-pulse">
+                                    <div className="flex justify-center text-xl text-slate-500 font-medium animate-pulse mt-20">
                                         Загрузка данных...
-                                    </span>
+                                    </div>
                                 ) : (
                                     <>
-                                        <div className="col-span-1 text-slate-500">#{item.id}</div>
+                                        <div className="col-span-1 text-slate-500 text-center">
+                                            #{item.id}
+                                        </div>
                                         <div className="col-span-2">
                                             <span
-                                                className={`flex items-center ${
+                                                className={`flex items-center justify-center ${
                                                     item.rating === 5
                                                         ? 'text-green-500'
                                                         : item.rating === 1
@@ -134,10 +136,10 @@ export function VirtualTable({ searchTerm, pageSize }: Props) {
                                                 </span>
                                             </span>
                                         </div>
-                                        <div className="col-span-3 text-slate-500">
+                                        <div className="col-span-3 text-slate-500 text-center">
                                             {formatClockString(item.date_time)}
                                         </div>
-                                        <div className="col-span-6 text-slate-600 font-medium">
+                                        <div className="col-span-6 text-slate-600 text-left text-base font-medium">
                                             {item.feedback_text}
                                         </div>
                                     </>

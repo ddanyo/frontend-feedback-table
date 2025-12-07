@@ -1,17 +1,19 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { getFeedbacks } from '../api/feedbacks';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { type Feedback } from '../interfaces/Feedback';
 import { NativeTable } from './NativeTable';
 import { TanstackTable } from './TanstackTable';
 
-interface Props {
+export function DynamicTable({
+    searchTerm,
+    pageSize,
+    useTanstackTable,
+}: {
     searchTerm: string;
     pageSize: number;
     useTanstackTable: boolean;
-}
-
-export function DynamicTable({ searchTerm, pageSize, useTanstackTable }: Props) {
+}) {
     const [items, setItems] = useState<Feedback[]>([]);
     const [page, setPage] = useState(1);
 
@@ -21,29 +23,30 @@ export function DynamicTable({ searchTerm, pageSize, useTanstackTable }: Props) 
 
     const observerTarget = useRef<HTMLDivElement>(null);
 
-    const loadData = async (targetPage: number, reset: boolean) => {
-        if (isLoading) return;
+    const loadData = useCallback(
+        async (targetPage: number, reset: boolean) => {
+            setIsLoading(true);
+            try {
+                const data = await getFeedbacks({
+                    skip: (targetPage - 1) * pageSize,
+                    take: pageSize,
+                    search: searchTerm,
+                    sortBy: FeedbackSort.NEWEST,
+                });
 
-        setIsLoading(true);
-        setError(null);
-        try {
-            const data = await getFeedbacks({
-                skip: (targetPage - 1) * pageSize,
-                take: pageSize,
-                search: searchTerm,
-                sortBy: FeedbackSort.NEWEST,
-            });
-
-            setItems((prev) => (reset ? data.items : [...prev, ...data.items]));
-            setHasMore(targetPage < data.totalPages);
-            setPage(targetPage);
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred';
-            setError(errorMessage);
-        } finally {
-            setIsLoading(false);
-        }
-    };
+                setItems((prev) => (reset ? data.items : [...prev, ...data.items]));
+                setHasMore(targetPage < data.totalPages);
+                setPage(targetPage);
+            } catch (e: unknown) {
+                const errorMessage =
+                    e instanceof Error ? e.message : 'An unexpected error occurred';
+                setError(errorMessage);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [searchTerm, pageSize]
+    );
 
     useEffect(() => {
         setPage(1);
@@ -51,35 +54,37 @@ export function DynamicTable({ searchTerm, pageSize, useTanstackTable }: Props) 
         setHasMore(true);
 
         loadData(1, true);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchTerm, pageSize]);
+    }, [searchTerm, pageSize, loadData]);
+
+    const callback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                loadData(page + 1, false);
+                observer.unobserve(entry.target);
+            }
+        });
+    };
+
+    const options = {
+        threshold: 0.1,
+        rootMargin: '100px',
+    };
 
     useEffect(() => {
         if (isLoading || !hasMore) return;
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                // entries[0] — observerTarget
-                if (entries[0].isIntersecting) {
-                    loadData(page + 1, false);
-                }
-            },
-            {
-                threshold: 0.1,
-                rootMargin: '100px',
-            }
-        );
-
+        const observer = new IntersectionObserver(callback, options);
         const currentTarget = observerTarget.current;
+
         if (currentTarget) {
             observer.observe(currentTarget);
         }
 
-        return () => {
-            if (currentTarget) {
-                observer.unobserve(currentTarget);
-            }
-        };
+        // return () => {
+        //     if (currentTarget) {
+        //         observer.unobserve(currentTarget);
+        //     }
+        // };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isLoading, hasMore, page, searchTerm, pageSize]);

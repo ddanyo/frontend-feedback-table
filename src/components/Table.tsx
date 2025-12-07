@@ -47,7 +47,7 @@ export function Table({
             <PaginatedTable
                 searchTerm={searchTerm}
                 pageSettings={pageSettings}
-                settings={settings}
+                useTanstackTable={settings.tanstackTable}
                 onPageSettingsChange={onPageSettingsChange}
             />
         </div>

@@ -9,16 +9,12 @@ import { PageSwitcher } from './PageSwitcher';
 
 export function PaginatedTable({
     searchTerm,
-    settings,
+    useTanstackTable,
     pageSettings,
     onPageSettingsChange,
 }: {
     searchTerm: string;
-    settings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-    };
+    useTanstackTable: boolean;
     pageSettings: {
         page: number;
         pageSize: number;
@@ -82,14 +78,14 @@ export function PaginatedTable({
     return (
         <div className="flex flex-col h-full gap-2">
             <div className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
-                {settings.tanstackTable ? (
+                {useTanstackTable ? (
                     <TanstackTable data={feedbackList} />
                 ) : (
                     <NativeTable data={feedbackList} searchTerm={searchTerm} />
                 )}
             </div>
 
-            <div className="h-6 py-4 mb-1">
+            <div className="h-6 my-2">
                 <PageSwitcher
                     pageSettings={pageSettings}
                     onPageSettingsChange={onPageSettingsChange}
