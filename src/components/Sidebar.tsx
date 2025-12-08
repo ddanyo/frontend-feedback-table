@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Switcher } from './Switcher';
+import { Settings } from 'lucide-react';
 
 export function Sidebar({
     settings,
@@ -30,24 +31,11 @@ export function Sidebar({
         countPages: number;
     }) => void;
 }) {
-    const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
-    useEffect(() => {
-        const newPageStr = pageSettings.page.toString();
-        if (localPage !== newPageStr) {
-            setLocalPage(newPageStr);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [pageSettings.page]);
-
     const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
     useEffect(() => {
-        const newSizeStr = pageSettings.pageSize.toString();
-        if (localPageSize !== newSizeStr) {
-            setLocalPageSize(newSizeStr);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLocalPageSize(pageSettings.pageSize.toString());
     }, [pageSettings.pageSize]);
-
     const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
@@ -68,13 +56,7 @@ export function Sidebar({
     }
 
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-        setLocalPageSize(val);
-        if (val === '') return;
-        const numVal = parseInt(val, 10);
-        if (!isNaN(numVal) && numVal >= 5 && numVal <= 100) {
-            onPageSettingsChange({ ...pageSettings, pageSize: numVal });
-        }
+        setLocalPageSize(e.target.value);
     };
 
     const handlePageSizeBlur = () => {
@@ -110,10 +92,10 @@ export function Sidebar({
                 >
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="p-2 rounded-xl bg-slate-200 text-xl cursor-pointer transition hover:bg-slate-300"
+                        className="p-2 rounded-2xl bg-slate-200 text-xl cursor-pointer transition hover:-translate-y-0.5"
                         title="Открыть настройки"
                     >
-                        ⚙️
+                        <Settings size={30} color={'gray'} />
                     </button>
                 </div>
 

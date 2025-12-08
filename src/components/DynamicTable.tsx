@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { getFeedbacks } from '../api/feedbacks';
-import { FeedbackSort } from '../constans/FeedbackSort';
-import { type Feedback } from '../interfaces/Feedback';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { NativeTable } from './NativeTable';
+import { FeedbackSort } from '../constans/FeedbackSort';
 import { TanstackTable } from './TanstackTable';
+import type { Feedback } from '../interfaces/Feedback';
+import { getFeedbacks } from '../api/feedbacks';
 
 export function DynamicTable({
     searchTerm,
@@ -15,28 +15,32 @@ export function DynamicTable({
     useTanstackTable: boolean;
 }) {
     const [items, setItems] = useState<Feedback[]>([]);
-    const [page, setPage] = useState(1);
+    const [localPage, setLocalPage] = useState(1);
 
     const [isLoading, setIsLoading] = useState(false);
     const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const observerTarget = useRef<HTMLDivElement>(null);
-
     const loadData = useCallback(
         async (targetPage: number, reset: boolean) => {
+            if (reset) {
+                setLocalPage(1);
+                setItems([]);
+                setHasMore(true);
+            }
             setIsLoading(true);
+
             try {
-                const data = await getFeedbacks({
+                const params = {
                     skip: (targetPage - 1) * pageSize,
                     take: pageSize,
                     search: searchTerm,
                     sortBy: FeedbackSort.NEWEST,
-                });
-
+                };
+                const data = await getFeedbacks(params);
                 setItems((prev) => (reset ? data.items : [...prev, ...data.items]));
+                setLocalPage(targetPage);
                 setHasMore(targetPage < data.totalPages);
-                setPage(targetPage);
             } catch (e: unknown) {
                 const errorMessage =
                     e instanceof Error ? e.message : 'An unexpected error occurred';
@@ -49,45 +53,32 @@ export function DynamicTable({
     );
 
     useEffect(() => {
-        setPage(1);
-        setItems([]);
-        setHasMore(true);
-
         loadData(1, true);
     }, [searchTerm, pageSize, loadData]);
 
-    const callback = (entries: IntersectionObserverEntry[], observer: IntersectionObserver) => {
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
-                loadData(page + 1, false);
-                observer.unobserve(entry.target);
+                loadData(localPage + 1, false);
             }
         });
     };
 
-    const options = {
+    const observerOptions = {
         threshold: 0.1,
         rootMargin: '100px',
     };
+    const observerTarget = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        if (isLoading || !hasMore) return;
-
-        const observer = new IntersectionObserver(callback, options);
-        const currentTarget = observerTarget.current;
-
-        if (currentTarget) {
-            observer.observe(currentTarget);
+        const observer = new IntersectionObserver(observerCallback, observerOptions);
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
         }
-
-        // return () => {
-        //     if (currentTarget) {
-        //         observer.unobserve(currentTarget);
-        //     }
-        // };
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isLoading, hasMore, page, searchTerm, pageSize]);
+        return () => {
+            observer.disconnect();
+        };
+    });
 
     if (isLoading && items.length === 0)
         return <div className="text-center mt-20 text-slate-500">Загрузка...</div>;
@@ -110,9 +101,7 @@ export function DynamicTable({
                         Подгрузка данных...
                     </span>
                 )}
-                {!hasMore && items.length > 0 && (
-                    <span className="text-slate-400 text-sm">Все записи загружены</span>
-                )}
+                {!hasMore && <span className="text-slate-400 text-sm">Все записи загружены</span>}
             </div>
         </>
     );

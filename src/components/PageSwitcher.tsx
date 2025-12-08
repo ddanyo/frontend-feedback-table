@@ -12,32 +12,17 @@ export function PageSwitcher({
     }) => void;
 }) {
     const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
-    useEffect(() => {
-        const newPageStr = pageSettings.page.toString();
 
-        if (localPage !== newPageStr) {
-            // eslint-disable-next-line react-hooks/set-state-in-effect
-            setLocalPage(newPageStr);
-        }
-    }, [localPage, pageSettings.page]);
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setLocalPage(pageSettings.page.toString());
+    }, [pageSettings.page]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
-
-        setLocalPage(val);
-
-        if (val === '') return;
-
-        const numVal = parseInt(val, 10);
-
-        if (!isNaN(numVal)) {
-            if (numVal >= 1 && numVal <= pageSettings.countPages) {
-                onPageSettingsChange({ ...pageSettings, page: numVal });
-            }
-        }
+        setLocalPage(e.target.value);
     };
 
-    const handleBlur = () => {
+    const commitPageChange = () => {
         let numVal = parseInt(localPage, 10);
 
         if (isNaN(numVal) || numVal < 1) {
@@ -47,15 +32,13 @@ export function PageSwitcher({
 
         if (numVal > pageSettings.countPages) {
             numVal = pageSettings.countPages;
-            onPageSettingsChange({ ...pageSettings, page: numVal });
-            setLocalPage(numVal.toString());
-            return;
         }
+
+        setLocalPage(numVal.toString());
 
         if (numVal !== pageSettings.page) {
             onPageSettingsChange({ ...pageSettings, page: numVal });
         }
-        setLocalPage(numVal.toString());
     };
 
     function handlePrevPage() {
@@ -93,12 +76,12 @@ export function PageSwitcher({
                 type="number"
                 min={1}
                 max={pageSettings.countPages}
+                inputMode="numeric"
                 value={localPage}
                 onChange={handleInputChange}
-                onBlur={handleBlur}
+                onBlur={commitPageChange}
                 onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                        handleBlur();
                         (e.target as HTMLInputElement).blur();
                     }
                 }}

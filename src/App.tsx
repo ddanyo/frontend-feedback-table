@@ -2,11 +2,15 @@ import { useState } from 'react';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
-import { useDebounce } from './hooks/useDebounce';
+import { useDebounceNew } from './hooks/useDebounce';
 
 function App() {
     const [searchTerm, setSearchTerm] = useState('');
-    const debounceSearch = useDebounce(searchTerm);
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    useDebounceNew(() => {
+        setDebouncedSearch(searchTerm);
+    });
+
     const [settings, setSettings] = useState({
         tanstackTable: false,
         tanstackVirtual: false,
@@ -32,7 +36,7 @@ function App() {
                 <main className="flex flex-col items-center flex-1 px-6 pt-8">
                     <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
                         <Table
-                            searchTerm={debounceSearch}
+                            searchTerm={debouncedSearch}
                             settings={settings}
                             pageSettings={pageSettings}
                             onPageSettingsChange={setPageSettings}
