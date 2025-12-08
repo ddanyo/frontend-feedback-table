@@ -1,6 +1,5 @@
 import { PaginatedTable } from './PaginatedTable';
 import { DynamicTable } from './DynamicTable';
-import { VirtualTable } from './VirtualTable';
 
 export function Table({
     searchTerm,
@@ -27,10 +26,6 @@ export function Table({
     }) => void;
 }) {
     if (settings.dynamicMode) {
-        if (settings.tanstackVirtual) {
-            return <VirtualTable searchTerm={searchTerm} pageSize={pageSettings.pageSize} />;
-        }
-
         return (
             <div className="overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg">
                 <DynamicTable
