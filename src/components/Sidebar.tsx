@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Switcher } from './Switcher';
-import { Settings } from 'lucide-react';
+import { Settings, X, Menu } from 'lucide-react';
 
 export function Sidebar({
     settings,
@@ -92,10 +92,10 @@ export function Sidebar({
                 >
                     <button
                         onClick={() => setIsOpen(true)}
-                        className="p-2 rounded-2xl bg-slate-200 text-xl cursor-pointer transition hover:-translate-y-0.5"
+                        className="p-2 rounded-2xl bg-none text-xl cursor-pointer transition hover:-translate-y-0.5"
                         title="Открыть настройки"
                     >
-                        <Settings size={30} color={'gray'} />
+                        <Menu size={40} className="text-slate-500" />
                     </button>
                 </div>
 
@@ -110,28 +110,16 @@ export function Sidebar({
                 >
                     <div className="flex flex-col min-h-full p-5">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-2 text-slate-500 text-xl font-bold ml-1">
-                                <span>⚙️</span>
+                            <div className="flex items-center justify-center gap-2 text-slate-500 text-xl font-bold ml-1">
+                                <Settings size={25} />
                                 <span>Настройки</span>
                             </div>
                             <button
                                 onClick={() => setIsOpen(false)}
+                                title="Закрыть настройки"
                                 className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    strokeWidth={2}
-                                    stroke="currentColor"
-                                    className="w-6 h-6"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        d="M6 18L18 6M6 6l12 12"
-                                    />
-                                </svg>
+                                <X size={25} />
                             </button>
                         </div>
 

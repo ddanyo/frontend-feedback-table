@@ -1,3 +1,5 @@
+import { Search } from 'lucide-react';
+
 export function Header({
     searchTerm,
     onSearchTermChange,
@@ -10,7 +12,8 @@ export function Header({
             <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-blue-800 via-blue-600 to-blue-400 m-4 pb-1">
                 Отзывы
             </h1>
-            <div className="w-100 pr-8">
+            <div className="w-100 pr-8 inline-flex items-center gap-2">
+                <Search size={38} className="text-slate-500" />
                 <input
                     type="text"
                     placeholder="Поиск..."

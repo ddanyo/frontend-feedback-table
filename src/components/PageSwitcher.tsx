@@ -1,4 +1,10 @@
 import { useEffect, useState } from 'react';
+import {
+    ChevronLeft,
+    ChevronRight,
+    // ChevronsLeft,
+    // ChevronsRight
+} from 'lucide-react';
 
 export function PageSwitcher({
     pageSettings,
@@ -57,20 +63,7 @@ export function PageSwitcher({
                 disabled={pageSettings.page === 1}
                 className="flex items-center justify-center text-slate-700 text-2xl bg-blue-500 w-12 h-7.5 rounded-md cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M15.75 19.5L8.25 12l7.5-7.5"
-                    />
-                </svg>
+                <ChevronLeft size={25} />
             </button>
             <input
                 type="number"
@@ -92,20 +85,7 @@ export function PageSwitcher({
                 onClick={handleNextPage}
                 disabled={pageSettings.page === pageSettings.countPages}
             >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    strokeWidth={2.5}
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                >
-                    <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                    />
-                </svg>
+                <ChevronRight size={25} />
             </button>
         </div>
     );

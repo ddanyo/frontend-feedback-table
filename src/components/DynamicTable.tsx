@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { NativeTable } from './NativeTable';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { TanstackTable } from './TanstackTable';
@@ -56,21 +56,24 @@ export function DynamicTable({
         loadData(1, true);
     }, [searchTerm, pageSize, loadData]);
 
-    const observerCallback = (entries: IntersectionObserverEntry[]) => {
-        entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-                loadData(localPage + 1, false);
-            }
-        });
-    };
-
-    const observerOptions = {
-        threshold: 0.1,
-        rootMargin: '100px',
-    };
+    const observerOptions = useMemo(
+        () => ({
+            threshold: 0.1,
+            rootMargin: '100px',
+        }),
+        []
+    );
     const observerTarget = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        if (isLoading || !hasMore) return;
+        const observerCallback = (entries: IntersectionObserverEntry[]) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    loadData(localPage + 1, false);
+                }
+            });
+        };
         const observer = new IntersectionObserver(observerCallback, observerOptions);
         if (observerTarget.current) {
             observer.observe(observerTarget.current);
@@ -78,7 +81,7 @@ export function DynamicTable({
         return () => {
             observer.disconnect();
         };
-    });
+    }, [observerOptions, isLoading, hasMore, localPage, loadData]);
 
     if (isLoading && items.length === 0)
         return <div className="text-center mt-20 text-slate-500">Загрузка...</div>;
