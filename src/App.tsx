@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
@@ -24,27 +26,30 @@ function App() {
     });
 
     return (
-        <div className="h-screen w-full bg-white flex flex-col">
-            <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
-            <div className="flex flex-1 overflow-hidden pb-6">
-                <Sidebar
-                    settings={settings}
-                    onSettingsChange={setSettings}
-                    pageSettings={pageSettings}
-                    onPageSettingsChange={setPageSettings}
-                />
-                <main className="flex flex-col items-center flex-1 px-6 pt-8">
-                    <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
-                        <Table
-                            searchTerm={debouncedSearch}
-                            settings={settings}
-                            pageSettings={pageSettings}
-                            onPageSettingsChange={setPageSettings}
-                        />
-                    </div>
-                </main>
+        <>
+            <Tooltip id="global-tooltip" />
+            <div className="h-screen w-full bg-white flex flex-col">
+                <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
+                <div className="flex flex-1 overflow-hidden pb-6">
+                    <Sidebar
+                        settings={settings}
+                        onSettingsChange={setSettings}
+                        pageSettings={pageSettings}
+                        onPageSettingsChange={setPageSettings}
+                    />
+                    <main className="flex flex-col items-center flex-1 px-6 pt-8">
+                        <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
+                            <Table
+                                searchTerm={debouncedSearch}
+                                settings={settings}
+                                pageSettings={pageSettings}
+                                onPageSettingsChange={setPageSettings}
+                            />
+                        </div>
+                    </main>
+                </div>
             </div>
-        </div>
+        </>
     );
 }
 

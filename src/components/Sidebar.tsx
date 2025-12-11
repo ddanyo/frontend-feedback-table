@@ -92,7 +92,8 @@ export function Sidebar({
                 <button
                     onClick={() => setIsOpen(true)}
                     className="p-2 rounded-2xl bg-none text-xl cursor-pointer transition hover:-translate-y-0.5"
-                    title="Открыть настройки"
+                    data-tooltip-id="global-tooltip"
+                    data-tooltip-content="Открыть настройки"
                 >
                     <Menu size={40} className="text-slate-500" />
                 </button>
@@ -115,7 +116,8 @@ export function Sidebar({
                         </div>
                         <button
                             onClick={() => setIsOpen(false)}
-                            title="Закрыть настройки"
+                            data-tooltip-id="global-tooltip"
+                            data-tooltip-content="Закрыть настройки"
                             className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                         >
                             <X size={25} />
@@ -227,7 +229,7 @@ export function Sidebar({
                                 <button
                                     onClick={handleDecreasePageSize}
                                     disabled={pageSettings.pageSize === 5}
-                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Minus className="w-6 h-6" strokeWidth={2.5} />
                                 </button>
@@ -249,7 +251,7 @@ export function Sidebar({
                                 <button
                                     onClick={handleIncreasePageSize}
                                     disabled={pageSettings.pageSize === 100}
-                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Plus className="w-6 h-6" strokeWidth={2.5} />
                                 </button>
