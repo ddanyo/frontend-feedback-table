@@ -59,7 +59,7 @@ export function DynamicTable({
     const observerOptions = useMemo(
         () => ({
             threshold: 0.1,
-            rootMargin: '100px',
+            rootMargin: '20%',
         }),
         []
     );
