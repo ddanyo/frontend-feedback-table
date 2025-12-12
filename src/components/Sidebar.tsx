@@ -100,9 +100,7 @@ export function Sidebar() {
 
                     <div className="flex flex-col flex-1 gap-1.5 mb-8">
                         <span className="text-sm font-medium text-slate-500">1. Режим таблицы</span>
-                        <div
-                            className={`pl-3 flex items-center justify-between transition ${settings.tanstackVirtual ? 'opacity-40 pointer-events-none' : ''}`}
-                        >
+                        <div className="pl-3 flex items-center justify-between transition">
                             <span className="text-base font-medium text-slate-700">
                                 Native Table
                             </span>
