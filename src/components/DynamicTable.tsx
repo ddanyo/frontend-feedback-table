@@ -4,16 +4,11 @@ import { FeedbackSort } from '../constans/FeedbackSort';
 import { TanstackTable } from './TanstackTable';
 import type { Feedback } from '../interfaces/Feedback';
 import { getFeedbacks } from '../api/feedbacks';
+import { useSettings } from '../context/AppContext';
 
-export function DynamicTable({
-    searchTerm,
-    pageSize,
-    useTanstackTable,
-}: {
-    searchTerm: string;
-    pageSize: number;
-    useTanstackTable: boolean;
-}) {
+export function DynamicTable() {
+    const { pageSettings, searchSettings, settings } = useSettings();
+
     const [items, setItems] = useState<Feedback[]>([]);
     const [localPage, setLocalPage] = useState(1);
 
@@ -32,9 +27,9 @@ export function DynamicTable({
 
             try {
                 const params = {
-                    skip: (targetPage - 1) * pageSize,
-                    take: pageSize,
-                    search: searchTerm,
+                    skip: (targetPage - 1) * pageSettings.pageSize,
+                    take: pageSettings.pageSize,
+                    search: searchSettings.searchTerm,
                     sortBy: FeedbackSort.NEWEST,
                 };
                 const data = await getFeedbacks(params);
@@ -49,12 +44,12 @@ export function DynamicTable({
                 setIsLoading(false);
             }
         },
-        [searchTerm, pageSize]
+        [searchSettings.searchTerm, pageSettings.pageSize]
     );
 
     useEffect(() => {
         loadData(1, true);
-    }, [searchTerm, pageSize, loadData]);
+    }, [searchSettings.searchTerm, pageSettings.pageSize, loadData]);
 
     const observerOptions = useMemo(
         () => ({
@@ -92,11 +87,7 @@ export function DynamicTable({
 
     return (
         <>
-            {useTanstackTable ? (
-                <TanstackTable data={items} />
-            ) : (
-                <NativeTable data={items} searchTerm={searchTerm} />
-            )}
+            {settings.tanstackTable ? <TanstackTable data={items} /> : <NativeTable data={items} />}
 
             <div ref={observerTarget} className="h-8 flex justify-center items-center w-full mt-2">
                 {isLoading && (

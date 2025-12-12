@@ -1,50 +1,20 @@
-import { useState } from 'react';
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
-import { useDebounceNew } from './hooks/useDebounce';
 
 function App() {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState('');
-    useDebounceNew(() => {
-        setDebouncedSearch(searchTerm);
-    });
-
-    const [settings, setSettings] = useState({
-        tanstackTable: false,
-        tanstackVirtual: false,
-        zustand: false,
-        dynamicMode: false,
-    });
-    const [pageSettings, setPageSettings] = useState({
-        page: 1,
-        pageSize: 10,
-        countPages: 1,
-    });
-
     return (
         <>
             <Tooltip id="global-tooltip" />
             <div className="h-screen w-full bg-white flex flex-col">
-                <Header searchTerm={searchTerm} onSearchTermChange={setSearchTerm} />
+                <Header />
                 <div className="flex flex-1 overflow-hidden pb-6">
-                    <Sidebar
-                        settings={settings}
-                        onSettingsChange={setSettings}
-                        pageSettings={pageSettings}
-                        onPageSettingsChange={setPageSettings}
-                    />
+                    <Sidebar />
                     <main className="flex flex-col items-center flex-1 px-6 pt-8">
                         <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
-                            <Table
-                                searchTerm={debouncedSearch}
-                                settings={settings}
-                                pageSettings={pageSettings}
-                                onPageSettingsChange={setPageSettings}
-                            />
+                            <Table />
                         </div>
                     </main>
                 </div>

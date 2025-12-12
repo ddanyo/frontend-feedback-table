@@ -5,18 +5,10 @@ import {
     // ChevronsLeft,
     // ChevronsRight
 } from 'lucide-react';
+import { useSettings } from '../context/AppContext';
 
-export function PageSwitcher({
-    pageSettings,
-    onPageSettingsChange,
-}: {
-    pageSettings: { page: number; pageSize: number; countPages: number };
-    onPageSettingsChange: (newSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    }) => void;
-}) {
+export function PageSwitcher() {
+    const { pageSettings, setPageSettings } = useSettings();
     const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
 
     useEffect(() => {
@@ -43,17 +35,17 @@ export function PageSwitcher({
         setLocalPage(numVal.toString());
 
         if (numVal !== pageSettings.page) {
-            onPageSettingsChange({ ...pageSettings, page: numVal });
+            setPageSettings({ ...pageSettings, page: numVal });
         }
     };
 
     function handlePrevPage() {
         if (pageSettings.page > 1) {
-            onPageSettingsChange({ ...pageSettings, page: pageSettings.page - 1 });
+            setPageSettings({ ...pageSettings, page: pageSettings.page - 1 });
         }
     }
     function handleNextPage() {
-        onPageSettingsChange({ ...pageSettings, page: pageSettings.page + 1 });
+        setPageSettings({ ...pageSettings, page: pageSettings.page + 1 });
     }
 
     return (

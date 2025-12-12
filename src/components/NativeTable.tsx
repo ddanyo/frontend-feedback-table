@@ -1,8 +1,10 @@
 import { StarIcon } from '../components/icons/StarIcon';
 import { type Feedback } from '../interfaces/Feedback';
 import { getHighlightedText } from '../utils/highlight';
+import { useSettings } from '../context/AppContext';
 
-export function NativeTable({ data, searchTerm }: { data: Feedback[]; searchTerm: string }) {
+export function NativeTable({ data }: { data: Feedback[] }) {
+    const { searchSettings } = useSettings();
     const formatClockString = (date: Date): string => {
         return new Intl.DateTimeFormat('ru-RU', {
             hour: '2-digit',
@@ -49,7 +51,7 @@ export function NativeTable({ data, searchTerm }: { data: Feedback[]; searchTerm
                             {formatClockString(new Date(item.date_time))}
                         </td>
                         <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
-                            {getHighlightedText(item.feedback_text, searchTerm)}
+                            {getHighlightedText(item.feedback_text, searchSettings.searchTerm)}
                         </td>
                     </tr>
                 ))}

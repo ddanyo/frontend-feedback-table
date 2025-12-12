@@ -1,36 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Switcher } from './Switcher';
 import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
+import { useSettings } from '../context/AppContext';
 
-export function Sidebar({
-    settings,
-    onSettingsChange,
-    pageSettings,
-    onPageSettingsChange,
-}: {
-    settings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    };
-    onSettingsChange: (newSettings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    }) => void;
-    pageSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    };
-    onPageSettingsChange: (newSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    }) => void;
-}) {
+export function Sidebar() {
+    const { pageSettings, setPageSettings, settings, setSettings } = useSettings();
     const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -40,18 +14,18 @@ export function Sidebar({
 
     function handleDecreasePageSize() {
         if (pageSettings.pageSize >= 10) {
-            onPageSettingsChange({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
+            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
         }
         if (pageSettings.pageSize - 5 < 5) {
-            onPageSettingsChange({ ...pageSettings, pageSize: 5 });
+            setPageSettings({ ...pageSettings, pageSize: 5 });
         }
     }
     function handleIncreasePageSize() {
         if (pageSettings.pageSize <= 95) {
-            onPageSettingsChange({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
+            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
         }
         if (pageSettings.pageSize + 5 > 100) {
-            onPageSettingsChange({ ...pageSettings, pageSize: 100 });
+            setPageSettings({ ...pageSettings, pageSize: 100 });
         }
     }
 
@@ -69,7 +43,7 @@ export function Sidebar({
             numVal = 100;
         }
         if (numVal !== pageSettings.pageSize) {
-            onPageSettingsChange({ ...pageSettings, pageSize: numVal });
+            setPageSettings({ ...pageSettings, pageSize: numVal });
         }
         setLocalPageSize(numVal.toString());
     };
@@ -135,7 +109,7 @@ export function Sidebar({
                             <Switcher
                                 enabled={settings.tanstackTable}
                                 onChange={() => {
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         tanstackTable: !settings.tanstackTable,
                                     });
@@ -155,7 +129,7 @@ export function Sidebar({
                                 enabled={settings.dynamicMode}
                                 onChange={() => {
                                     const isDynamicMode = !settings.dynamicMode;
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         dynamicMode: isDynamicMode,
                                         tanstackVirtual: isDynamicMode
@@ -180,7 +154,7 @@ export function Sidebar({
                                 <Switcher
                                     enabled={settings.tanstackVirtual}
                                     onChange={() =>
-                                        onSettingsChange({
+                                        setSettings({
                                             ...settings,
                                             tanstackVirtual: !settings.tanstackVirtual,
                                         })
@@ -202,7 +176,7 @@ export function Sidebar({
                             <Switcher
                                 enabled={settings.zustand}
                                 onChange={() =>
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         zustand: !settings.zustand,
                                     })

@@ -7,6 +7,18 @@ import {
 } from '@tanstack/react-table';
 import { type Feedback } from '../interfaces/Feedback';
 import { StarIcon } from '../components/icons/StarIcon';
+import { getHighlightedText } from '../utils/highlight';
+import { useSettings } from '../context/AppContext';
+
+const FeedbackTextCell = ({ text }: { text: string }) => {
+    const { searchSettings } = useSettings();
+
+    return (
+        <span className="text-slate-600 font-medium">
+            {getHighlightedText(text, searchSettings.searchTerm)}
+        </span>
+    );
+};
 
 export function TanstackTable({ data }: { data: Feedback[] }) {
     const formatClockString = (date: Date): string => {
@@ -54,9 +66,7 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
             }),
             columnHelper.accessor('feedback_text', {
                 header: 'Текст отзыва',
-                cell: (props) => (
-                    <span className="text-slate-600 font-medium">{props.getValue()}</span>
-                ),
+                cell: (props) => <FeedbackTextCell text={props.getValue() ?? ''} />,
             }),
         ];
     }, []);
