@@ -16,6 +16,8 @@ export function PaginatedTable() {
         take: pageSettings.pageSize,
         search: searchSettings.searchTerm,
         sortBy: FeedbackSort.NEWEST,
+        caseSensitive: searchSettings.caseSensitive,
+        wholeWord: searchSettings.wholeWord,
     };
 
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({

@@ -15,7 +15,12 @@ const FeedbackTextCell = ({ text }: { text: string }) => {
 
     return (
         <span className="text-slate-600 font-medium">
-            {getHighlightedText(text, searchSettings.searchTerm)}
+            {getHighlightedText(
+                text,
+                searchSettings.searchTerm,
+                searchSettings.caseSensitive,
+                searchSettings.wholeWord
+            )}
         </span>
     );
 };

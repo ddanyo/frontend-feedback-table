@@ -51,7 +51,12 @@ export function NativeTable({ data }: { data: Feedback[] }) {
                             {formatClockString(new Date(item.date_time))}
                         </td>
                         <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
-                            {getHighlightedText(item.feedback_text, searchSettings.searchTerm)}
+                            {getHighlightedText(
+                                item.feedback_text,
+                                searchSettings.searchTerm,
+                                searchSettings.caseSensitive,
+                                searchSettings.wholeWord
+                            )}
                         </td>
                     </tr>
                 ))}

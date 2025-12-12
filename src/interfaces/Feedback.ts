@@ -14,6 +14,8 @@ export interface GetFeedbacksParams {
     take?: number;
     search?: string;
     sortBy?: FeedbackSort;
+    caseSensitive?: boolean;
+    wholeWord?: boolean;
 }
 
 export interface FeedbackResponse {
