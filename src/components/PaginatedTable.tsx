@@ -64,7 +64,7 @@ export function PaginatedTable() {
 
     return (
         <div className="flex flex-col h-full gap-2">
-            <div className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
+            <div className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
                 {settings.tanstackTable ? (
                     <TanstackTable data={feedbackList} />
                 ) : (
