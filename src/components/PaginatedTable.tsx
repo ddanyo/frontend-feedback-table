@@ -6,31 +6,18 @@ import { type FeedbackResponse } from '../interfaces/Feedback';
 import { NativeTable } from './NativeTable';
 import { TanstackTable } from './TanstackTable';
 import { PageSwitcher } from './PageSwitcher';
+import { useSettings } from '../context/AppContext';
+// import { useDebounce } from '../hooks/useDebounce';
 
-export function PaginatedTable({
-    searchTerm,
-    useTanstackTable,
-    pageSettings,
-    onPageSettingsChange,
-}: {
-    searchTerm: string;
-    useTanstackTable: boolean;
-    pageSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    };
-    onPageSettingsChange: (newSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    }) => void;
-}) {
+export function PaginatedTable() {
+    const { pageSettings, setPageSettings, searchSettings, settings } = useSettings();
     const queryParams = {
         skip: (pageSettings.page - 1) * pageSettings.pageSize,
         take: pageSettings.pageSize,
-        search: searchTerm,
+        search: searchSettings.searchTerm,
         sortBy: FeedbackSort.NEWEST,
+        caseSensitive: searchSettings.caseSensitive,
+        wholeWord: searchSettings.wholeWord,
     };
 
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
@@ -44,7 +31,7 @@ export function PaginatedTable({
 
     useEffect(() => {
         if (totalPages !== pageSettings.countPages) {
-            onPageSettingsChange({
+            setPageSettings({
                 ...pageSettings,
                 countPages: totalPages,
             });
@@ -78,18 +65,15 @@ export function PaginatedTable({
     return (
         <div className="flex flex-col h-full gap-2">
             <div className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
-                {useTanstackTable ? (
+                {settings.tanstackTable ? (
                     <TanstackTable data={feedbackList} />
                 ) : (
-                    <NativeTable data={feedbackList} searchTerm={searchTerm} />
+                    <NativeTable data={feedbackList} />
                 )}
             </div>
 
             <div className="h-6 my-2">
-                <PageSwitcher
-                    pageSettings={pageSettings}
-                    onPageSettingsChange={onPageSettingsChange}
-                />
+                <PageSwitcher />
             </div>
         </div>
     );

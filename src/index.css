@@ -65,3 +65,12 @@ body {
         appearance: none;
     }
 }
+
+.react-tooltip {
+    padding: 6px 10px !important;
+    border-radius: 6px !important;
+    font-size: 13px !important;
+    font-weight: 500 !important;
+    z-index: 9999 !important;
+    transition: opacity 0.2s !important;
+}

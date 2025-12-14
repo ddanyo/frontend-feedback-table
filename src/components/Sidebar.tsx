@@ -1,36 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Switcher } from './Switcher';
 import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
+import { useSettings } from '../context/AppContext';
 
-export function Sidebar({
-    settings,
-    onSettingsChange,
-    pageSettings,
-    onPageSettingsChange,
-}: {
-    settings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    };
-    onSettingsChange: (newSettings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    }) => void;
-    pageSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    };
-    onPageSettingsChange: (newSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    }) => void;
-}) {
+export function Sidebar() {
+    const { pageSettings, setPageSettings, settings, setSettings } = useSettings();
     const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -40,18 +14,18 @@ export function Sidebar({
 
     function handleDecreasePageSize() {
         if (pageSettings.pageSize >= 10) {
-            onPageSettingsChange({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
+            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
         }
         if (pageSettings.pageSize - 5 < 5) {
-            onPageSettingsChange({ ...pageSettings, pageSize: 5 });
+            setPageSettings({ ...pageSettings, pageSize: 5 });
         }
     }
     function handleIncreasePageSize() {
         if (pageSettings.pageSize <= 95) {
-            onPageSettingsChange({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
+            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
         }
         if (pageSettings.pageSize + 5 > 100) {
-            onPageSettingsChange({ ...pageSettings, pageSize: 100 });
+            setPageSettings({ ...pageSettings, pageSize: 100 });
         }
     }
 
@@ -69,7 +43,7 @@ export function Sidebar({
             numVal = 100;
         }
         if (numVal !== pageSettings.pageSize) {
-            onPageSettingsChange({ ...pageSettings, pageSize: numVal });
+            setPageSettings({ ...pageSettings, pageSize: numVal });
         }
         setLocalPageSize(numVal.toString());
     };
@@ -92,7 +66,8 @@ export function Sidebar({
                 <button
                     onClick={() => setIsOpen(true)}
                     className="p-2 rounded-2xl bg-none text-xl cursor-pointer transition hover:-translate-y-0.5"
-                    title="Открыть настройки"
+                    data-tooltip-id="global-tooltip"
+                    data-tooltip-content="Открыть настройки"
                 >
                     <Menu size={40} className="text-slate-500" />
                 </button>
@@ -115,7 +90,8 @@ export function Sidebar({
                         </div>
                         <button
                             onClick={() => setIsOpen(false)}
-                            title="Закрыть настройки"
+                            data-tooltip-id="global-tooltip"
+                            data-tooltip-content="Закрыть настройки"
                             className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                         >
                             <X size={25} />
@@ -124,16 +100,14 @@ export function Sidebar({
 
                     <div className="flex flex-col flex-1 gap-1.5 mb-8">
                         <span className="text-sm font-medium text-slate-500">1. Режим таблицы</span>
-                        <div
-                            className={`pl-3 flex items-center justify-between transition ${settings.tanstackVirtual ? 'opacity-40 pointer-events-none' : ''}`}
-                        >
+                        <div className="pl-3 flex items-center justify-between transition">
                             <span className="text-base font-medium text-slate-700">
                                 Native Table
                             </span>
                             <Switcher
                                 enabled={settings.tanstackTable}
                                 onChange={() => {
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         tanstackTable: !settings.tanstackTable,
                                     });
@@ -153,7 +127,7 @@ export function Sidebar({
                                 enabled={settings.dynamicMode}
                                 onChange={() => {
                                     const isDynamicMode = !settings.dynamicMode;
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         dynamicMode: isDynamicMode,
                                         tanstackVirtual: isDynamicMode
@@ -178,7 +152,7 @@ export function Sidebar({
                                 <Switcher
                                     enabled={settings.tanstackVirtual}
                                     onChange={() =>
-                                        onSettingsChange({
+                                        setSettings({
                                             ...settings,
                                             tanstackVirtual: !settings.tanstackVirtual,
                                         })
@@ -200,7 +174,7 @@ export function Sidebar({
                             <Switcher
                                 enabled={settings.zustand}
                                 onChange={() =>
-                                    onSettingsChange({
+                                    setSettings({
                                         ...settings,
                                         zustand: !settings.zustand,
                                     })
@@ -227,7 +201,7 @@ export function Sidebar({
                                 <button
                                     onClick={handleDecreasePageSize}
                                     disabled={pageSettings.pageSize === 5}
-                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Minus className="w-6 h-6" strokeWidth={2.5} />
                                 </button>
@@ -249,7 +223,7 @@ export function Sidebar({
                                 <button
                                     onClick={handleIncreasePageSize}
                                     disabled={pageSettings.pageSize === 100}
-                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-100 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Plus className="w-6 h-6" strokeWidth={2.5} />
                                 </button>
