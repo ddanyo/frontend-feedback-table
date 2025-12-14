@@ -7,7 +7,7 @@ export const getHighlightedText = (
     wholeWord: boolean = false
 ): ReactNode => {
     if (!text) return null;
-    if (!highlight.trim()) return text;
+    if (!highlight) return text;
 
     const escapeReg = (string: string) => {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -16,7 +16,13 @@ export const getHighlightedText = (
     let pattern = escapeReg(highlight);
 
     if (wholeWord) {
-        pattern = `(?<![\\p{L}\\p{N}_])${pattern}(?![\\p{L}\\p{N}_])`;
+        if (/^[\p{L}\p{N}_]/u.test(highlight)) {
+            pattern = `(?<![\\p{L}\\p{N}_])${pattern}`;
+        }
+
+        if (/[\p{L}\p{N}_]$/u.test(highlight)) {
+            pattern = `${pattern}(?![\\p{L}\\p{N}_])`;
+        }
     }
 
     const regexPattern = `(${pattern})`;
