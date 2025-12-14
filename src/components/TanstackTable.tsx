@@ -134,7 +134,12 @@ export function TanstackTable({
                           if (!row) return null;
 
                           return (
-                              <tr key={row.id} className="hover:bg-slate-100">
+                              <tr
+                                  key={row.id}
+                                  data-index={virtualRow.index}
+                                  ref={virtualizer.measureElement}
+                                  className="hover:bg-slate-100"
+                              >
                                   {row.getAllCells().map((cell) => (
                                       <td
                                           key={cell.id}

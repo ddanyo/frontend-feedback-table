@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { NativeTable } from './NativeTable';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { TanstackTable } from './TanstackTable';
@@ -9,6 +9,7 @@ import { type Feedback, type FeedbackResponse } from '../interfaces/Feedback';
 
 export function NativeVirtual() {
     const { pageSettings, searchSettings, settings } = useSettings();
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     const [localPage, setLocalPage] = useState(1);
     const [allItems, setAllItems] = useState<Feedback[]>([]);
@@ -25,6 +26,7 @@ export function NativeVirtual() {
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
         queryFn: () => getFeedbacks(queryParams),
+        placeholderData: keepPreviousData,
     });
 
     const data = getFeedbacksQuery.data;
@@ -34,6 +36,9 @@ export function NativeVirtual() {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalPage(1);
         setAllItems([]);
+        if (scrollContainerRef.current) {
+            scrollContainerRef.current.scrollTop = 0;
+        }
     }, [
         searchSettings.searchTerm,
         pageSettings.pageSize,
@@ -42,9 +47,7 @@ export function NativeVirtual() {
     ]);
 
     useEffect(() => {
-        if (!data?.items) {
-            return;
-        }
+        if (!data?.items || data.items.length === 0) return;
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setAllItems((prevItems) => {
@@ -56,48 +59,40 @@ export function NativeVirtual() {
         });
     }, [data, localPage]);
 
-    const observerOptions = useMemo(
-        () => ({
-            threshold: 0.1,
-            rootMargin: '30%',
-        }),
-        []
-    );
     const observerTarget = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const element = observerTarget.current;
+        const scrollContainer = scrollContainerRef.current;
+
         if (
             !element ||
-            getFeedbacksQuery.isLoading ||
+            !scrollContainer ||
             getFeedbacksQuery.isFetching ||
             isLastPage ||
             getFeedbacksQuery.error
         )
             return;
 
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                setLocalPage((prev) => prev + 1);
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting) {
+                    setLocalPage((prev) => prev + 1);
+                }
+            },
+            {
+                root: scrollContainer,
+                threshold: 0.1,
+                rootMargin: '0px 0px 600px 0px',
             }
-        }, observerOptions);
+        );
 
         observer.observe(element);
 
         return () => {
             observer.disconnect();
         };
-    }, [
-        getFeedbacksQuery.isLoading,
-        allItems.length,
-        allItems,
-        data,
-        pageSettings.pageSize,
-        getFeedbacksQuery.isFetching,
-        getFeedbacksQuery.error,
-        observerOptions,
-        isLastPage,
-    ]);
+    }, [getFeedbacksQuery.isFetching, isLastPage, getFeedbacksQuery.error, allItems.length]);
 
     if (getFeedbacksQuery.isLoading && localPage === 1 && allItems.length === 0)
         return (
@@ -119,7 +114,10 @@ export function NativeVirtual() {
         );
 
     return (
-        <div className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
+        <div
+            ref={scrollContainerRef}
+            className="flex flex-col h-full overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
+        >
             {settings.tanstackTable ? (
                 <TanstackTable data={allItems} />
             ) : (

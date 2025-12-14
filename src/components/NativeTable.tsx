@@ -3,10 +3,14 @@ import { type Feedback } from '../interfaces/Feedback';
 import { getHighlightedText } from '../utils/highlight';
 import { useSettings } from '../context/AppContext';
 import { Virtualizer } from '@tanstack/react-virtual';
-import { memo } from 'react';
-import { type Key } from 'react';
 
-const TableRow = memo(({ item }: { item: Feedback & { virtualKey?: Key } }) => {
+export function NativeTable({
+    data,
+    virtualizer,
+}: {
+    data: Feedback[];
+    virtualizer?: Virtualizer<HTMLDivElement, Element>;
+}) {
     const { searchSettings } = useSettings();
 
     const formatClockString = (date: Date): string => {
@@ -20,40 +24,6 @@ const TableRow = memo(({ item }: { item: Feedback & { virtualKey?: Key } }) => {
             weekday: 'long',
         }).format(date);
     };
-
-    return (
-        <tr className="hover:bg-slate-100" style={{ contentVisibility: 'auto' }}>
-            <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
-            <td className="p-3">
-                <span
-                    className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
-                >
-                    <StarIcon className="w-5 h-5" />
-                    <span className="text-sm text-slate-500 font-medium ml-2">{item.rating}</span>
-                </span>
-            </td>
-            <td className="text-center p-3 text-sm text-slate-500">
-                {formatClockString(new Date(item.date_time))}
-            </td>
-            <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
-                {getHighlightedText(
-                    item.feedback_text,
-                    searchSettings.searchTerm,
-                    searchSettings.caseSensitive,
-                    searchSettings.wholeWord
-                )}
-            </td>
-        </tr>
-    );
-});
-
-export function NativeTable({
-    data,
-    virtualizer,
-}: {
-    data: Feedback[];
-    virtualizer?: Virtualizer<HTMLDivElement, Element>;
-}) {
     const virtualItems = virtualizer?.getVirtualItems() ?? [];
 
     const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
@@ -61,18 +31,6 @@ export function NativeTable({
         virtualItems.length > 0
             ? (virtualizer?.getTotalSize() ?? 0) - virtualItems[virtualItems.length - 1].end
             : 0;
-
-    const itemsToRender: ((Feedback & { virtualKey?: Key }) | null)[] = virtualizer
-        ? virtualItems.map((virtualRow) => {
-              const item = data[virtualRow.index];
-              if (!item) return null;
-
-              return {
-                  ...item,
-                  virtualKey: virtualRow.key,
-              };
-          })
-        : data;
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
@@ -102,11 +60,71 @@ export function NativeTable({
                     </tr>
                 )}
 
-                {itemsToRender.map((item) => {
-                    if (!item) return null;
+                {virtualizer
+                    ? virtualItems.map((virtualRow) => {
+                          const item = data[virtualRow.index];
+                          if (!item) return null;
 
-                    return <TableRow key={item.virtualKey ?? item.id} item={item} />;
-                })}
+                          return (
+                              <tr
+                                  key={virtualRow.key}
+                                  data-index={virtualRow.index}
+                                  ref={virtualizer.measureElement}
+                                  className="hover:bg-slate-100"
+                              >
+                                  <td className="text-center p-3 text-sm text-slate-500">
+                                      #{item.id}
+                                  </td>
+                                  <td className="p-3">
+                                      <span
+                                          className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                      >
+                                          <StarIcon className="w-5 h-5" />
+                                          <span className="text-sm text-slate-500 font-medium ml-2">
+                                              {item.rating}
+                                          </span>
+                                      </span>
+                                  </td>
+                                  <td className="text-center p-3 text-sm text-slate-500">
+                                      {formatClockString(new Date(item.date_time))}
+                                  </td>
+                                  <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
+                                      {getHighlightedText(
+                                          item.feedback_text,
+                                          searchSettings.searchTerm,
+                                          searchSettings.caseSensitive,
+                                          searchSettings.wholeWord
+                                      )}
+                                  </td>
+                              </tr>
+                          );
+                      })
+                    : data.map((item) => (
+                          <tr key={item.id} className="hover:bg-slate-100">
+                              <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
+                              <td className="p-3">
+                                  <span
+                                      className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                  >
+                                      <StarIcon className="w-5 h-5" />
+                                      <span className="text-sm text-slate-500 font-medium ml-2">
+                                          {item.rating}
+                                      </span>
+                                  </span>
+                              </td>
+                              <td className="text-center p-3 text-sm text-slate-500">
+                                  {formatClockString(new Date(item.date_time))}
+                              </td>
+                              <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
+                                  {getHighlightedText(
+                                      item.feedback_text,
+                                      searchSettings.searchTerm,
+                                      searchSettings.caseSensitive,
+                                      searchSettings.wholeWord
+                                  )}
+                              </td>
+                          </tr>
+                      ))}
 
                 {virtualizer && paddingBottom > 0 && (
                     <tr>

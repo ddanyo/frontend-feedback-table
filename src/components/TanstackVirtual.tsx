@@ -44,8 +44,8 @@ export function TanstackVirtual() {
     const virtualizer = useVirtualizer({
         count: getFeedbacksQuery.hasNextPage ? allItems.length + 1 : allItems.length,
         getScrollElement: () => tableContainerRef.current,
-        estimateSize: () => 50,
-        overscan: 5,
+        estimateSize: () => 60,
+        overscan: 10,
     });
 
     const virtualItems = virtualizer.getVirtualItems();
