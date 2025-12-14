@@ -28,6 +28,7 @@ export function NativeVirtual() {
     });
 
     const data = getFeedbacksQuery.data;
+    const isLastPage = data && data.items.length < pageSettings.pageSize;
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -58,7 +59,7 @@ export function NativeVirtual() {
     const observerOptions = useMemo(
         () => ({
             threshold: 0.1,
-            rootMargin: '20%',
+            rootMargin: '30%',
         }),
         []
     );
@@ -66,12 +67,11 @@ export function NativeVirtual() {
 
     useEffect(() => {
         const element = observerTarget.current;
-        const isDataExhausted = data && data.items.length < pageSettings.pageSize;
         if (
             !element ||
             getFeedbacksQuery.isLoading ||
             getFeedbacksQuery.isFetching ||
-            isDataExhausted ||
+            isLastPage ||
             getFeedbacksQuery.error
         )
             return;
@@ -96,9 +96,10 @@ export function NativeVirtual() {
         getFeedbacksQuery.isFetching,
         getFeedbacksQuery.error,
         observerOptions,
+        isLastPage,
     ]);
 
-    if (getFeedbacksQuery.isLoading)
+    if (getFeedbacksQuery.isLoading && localPage === 1 && allItems.length === 0)
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Загрузка...
@@ -125,15 +126,23 @@ export function NativeVirtual() {
                 <NativeTable data={allItems} />
             )}
 
-            <div ref={observerTarget} className="h-8 flex justify-center items-center w-full mt-2">
-                {getFeedbacksQuery.isLoading && (
+            <div
+                ref={observerTarget}
+                className="min-h-10 flex justify-center items-center w-full mt-2 pb-2"
+            >
+                {(getFeedbacksQuery.isLoading || getFeedbacksQuery.isFetching) && (
                     <span className="text-slate-500 text-sm animate-pulse font-medium">
                         Подгрузка данных...
                     </span>
                 )}
-                {allItems.length === 0 && !getFeedbacksQuery.isLoading && (
-                    <span className="text-slate-400 text-sm">Все записи загружены</span>
-                )}
+                {isLastPage &&
+                    !getFeedbacksQuery.isFetching &&
+                    allItems.length > 0 &&
+                    !getFeedbacksQuery.isLoading && (
+                        <span className="text-slate-400 text-sm font-medium">
+                            Все записи загружены
+                        </span>
+                    )}
             </div>
         </div>
     );

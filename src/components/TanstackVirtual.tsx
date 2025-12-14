@@ -106,14 +106,15 @@ export function TanstackVirtual() {
                 <NativeTable data={allItems} virtualizer={virtualizer} />
             )}
 
-            <div className="h-8 flex justify-center items-center w-full mt-2">
-                {getFeedbacksQuery.isLoading && (
+            <div className="min-h-10 flex justify-center items-center w-full mt-2 pb-2">
+                {getFeedbacksQuery.isFetchingNextPage && (
                     <span className="text-slate-500 text-sm animate-pulse font-medium">
                         Подгрузка данных...
                     </span>
                 )}
-                {allItems.length === 0 && !getFeedbacksQuery.isLoading && (
-                    <span className="text-slate-400 text-sm">Все записи загружены</span>
+
+                {!getFeedbacksQuery.hasNextPage && allItems.length > 0 && (
+                    <span className="text-slate-400 text-sm font-medium">Все записи загружены</span>
                 )}
             </div>
         </div>
