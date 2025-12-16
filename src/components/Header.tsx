@@ -1,5 +1,7 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useSettings } from '../context/AppContext';
+import { useDebounceNew } from '../hooks/useDebounce';
+import { useState } from 'react';
 
 export function Header() {
     const { searchSettings, setSearchSettings, pageSettings, setPageSettings } = useSettings();
@@ -15,6 +17,20 @@ export function Header() {
             wholeWord: !searchSettings.wholeWord,
         });
     }
+
+    const [localSearchterm, setLocalSearchterm] = useState('');
+
+    useDebounceNew(() => {
+        setSearchSettings({
+            ...searchSettings,
+            searchTerm: localSearchterm,
+        });
+        setPageSettings({
+            ...pageSettings,
+            page: 1,
+        });
+    }, 200);
+
     return (
         <header className="h-24 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">
             <h1 className="text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-blue-800 via-blue-600 to-blue-400 m-4 pb-1">
@@ -27,16 +43,9 @@ export function Header() {
                         type="text"
                         placeholder="Поиск..."
                         className="grow bg-transparent text-slate-800 text-xl px-4 py-2 border-none focus:outline-none focus:ring-0 placeholder:text-slate-400"
-                        value={searchSettings.searchTerm}
+                        value={localSearchterm}
                         onChange={(e) => {
-                            setSearchSettings({
-                                ...searchSettings,
-                                searchTerm: e.target.value,
-                            });
-                            setPageSettings({
-                                ...pageSettings,
-                                page: 1,
-                            });
+                            setLocalSearchterm(e.target.value);
                         }}
                     />
 

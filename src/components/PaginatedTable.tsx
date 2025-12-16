@@ -7,7 +7,6 @@ import { NativeTable } from './NativeTable';
 import { TanstackTable } from './TanstackTable';
 import { PageSwitcher } from './pagination/PageSwitcher';
 import { useSettings } from '../context/AppContext';
-// import { useDebounce } from '../hooks/useDebounce';
 
 export function PaginatedTable() {
     const { pageSettings, setPageSettings, searchSettings, settings } = useSettings();
