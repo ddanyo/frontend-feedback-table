@@ -1,11 +1,11 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { getFeedbacks } from '../api/feedbacks';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { type FeedbackResponse } from '../interfaces/Feedback';
 import { NativeTable } from './NativeTable';
 import { TanstackTable } from './TanstackTable';
-import { PageSwitcher } from './PageSwitcher';
+import { PageSwitcher } from './pagination/PageSwitcher';
 import { useSettings } from '../context/AppContext';
 // import { useDebounce } from '../hooks/useDebounce';
 
@@ -23,11 +23,11 @@ export function PaginatedTable() {
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
         queryFn: () => getFeedbacks(queryParams),
+        placeholderData: keepPreviousData,
     });
     const data = getFeedbacksQuery.data;
     const items = data?.items || [];
     const totalPages = data?.totalPages || 0;
-    const feedbackList = data?.items || [];
 
     useEffect(() => {
         if (totalPages !== pageSettings.countPages) {
@@ -63,12 +63,12 @@ export function PaginatedTable() {
     }
 
     return (
-        <div className="flex flex-col h-full gap-2">
+        <div className="flex flex-col justify-between h-full gap-2">
             <div className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
                 {settings.tanstackTable ? (
-                    <TanstackTable data={feedbackList} />
+                    <TanstackTable data={items} />
                 ) : (
-                    <NativeTable data={feedbackList} />
+                    <NativeTable data={items} />
                 )}
             </div>
 

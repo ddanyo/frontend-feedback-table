@@ -5,7 +5,7 @@ import {
     // ChevronsLeft,
     // ChevronsRight
 } from 'lucide-react';
-import { useSettings } from '../context/AppContext';
+import { useSettings } from '../../context/AppContext';
 
 export function PageSwitcher() {
     const { pageSettings, setPageSettings } = useSettings();

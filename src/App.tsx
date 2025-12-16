@@ -12,7 +12,7 @@ function App() {
                 <Header />
                 <div className="flex flex-1 overflow-hidden pb-6">
                     <Sidebar />
-                    <main className="flex flex-col items-center flex-1 px-6 pt-8">
+                    <main className="flex flex-col flex-1 items-center px-6 pt-8">
                         <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
                             <Table />
                         </div>

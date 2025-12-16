@@ -167,7 +167,7 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             3. Режим подгрузки
                         </span>
-                        <div className="flex items-center justify-between pl-3">
+                        <div className="flex items-center justify-between pl-3 mb-2">
                             <span className="text-base font-medium text-slate-700">
                                 База данных
                             </span>
@@ -184,13 +184,13 @@ export function Sidebar() {
                         </div>
                     </div>
 
-                    {!settings.dynamicMode ? (
+                    {!settings.dynamicMode && (
                         <div
                             className="
                                 flex flex-col items-center justify-center 
                                 w-full rounded-lg p-3 gap-2 
                                 border-2 border-dashed border-slate-300 
-                                mt-auto pt-4
+                                mt-auto
                             "
                         >
                             <span className="text-sm font-medium text-slate-500">
@@ -229,7 +229,7 @@ export function Sidebar() {
                                 </button>
                             </div>
                         </div>
-                    ) : null}
+                    )}
                 </div>
             </div>
         </aside>
