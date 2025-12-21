@@ -14,8 +14,8 @@ export function TVNativeTable() {
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', searchSettings, pageSettings.pageSize],
-        queryFn: async ({ pageParam = 1 }) => {
+        queryKey: ['feedbacks', searchSettings],
+        queryFn: async ({ pageParam }) => {
             const params = {
                 skip: (pageParam - 1) * pageSettings.pageSize,
                 take: pageSettings.pageSize,
@@ -26,24 +26,24 @@ export function TVNativeTable() {
             };
             return await getFeedbacks(params);
         },
-        getNextPageParam: (lastPage, allPages) => {
-            const totalLoaded = allPages.flatMap((p) => p.items).length;
-            if (totalLoaded < lastPage.total) {
-                return allPages.length + 1;
+        getNextPageParam: (lastPage, _, lastPageParam) => {
+            if (lastPage.total === 0) {
+                return undefined;
             }
-            return undefined;
+            return lastPageParam + 1;
         },
         initialPageParam: 1,
     });
 
-    const data = getFeedbacksQuery.data;
+    const { data, hasNextPage, isFetchingNextPage, fetchNextPage, error, isError, isLoading } =
+        getFeedbacksQuery;
+
     const allItems = useMemo(() => {
         return data?.pages.flatMap((page) => page.items) ?? [];
     }, [data]);
 
     // eslint-disable-next-line react-hooks/incompatible-library
     const virtualizer = useVirtualizer({
-        // count: getFeedbacksQuery.hasNextPage ? allItems.length + 1 : allItems.length,
         count: allItems.length,
         getScrollElement: () => tableContainerRef.current,
         estimateSize: () => 60,
@@ -57,27 +57,20 @@ export function TVNativeTable() {
         if (
             lastItem &&
             lastItem.index >= allItems.length - 1 &&
-            getFeedbacksQuery.hasNextPage &&
-            !getFeedbacksQuery.isFetchingNextPage
+            hasNextPage &&
+            !isFetchingNextPage
         ) {
-            getFeedbacksQuery.fetchNextPage();
+            fetchNextPage();
         }
-    }, [
-        virtualItems,
-        allItems.length,
-        getFeedbacksQuery.hasNextPage,
-        getFeedbacksQuery.isFetchingNextPage,
-        getFeedbacksQuery.fetchNextPage,
-        getFeedbacksQuery,
-    ]);
+    }, [virtualItems, allItems.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
 
     const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
     const paddingBottom =
         virtualItems.length > 0
-            ? (virtualizer?.getTotalSize() ?? 0) - virtualItems[virtualItems.length - 1].end
+            ? (virtualizer.getTotalSize() ?? 0) - virtualItems[virtualItems.length - 1].end
             : 0;
 
-    if (getFeedbacksQuery.isPending) {
+    if (isLoading) {
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Загрузка...
@@ -85,12 +78,10 @@ export function TVNativeTable() {
         );
     }
 
-    if (getFeedbacksQuery.isError) {
+    if (isError) {
         return (
             <div className="flex justify-center text-xl text-red-500 font-medium mt-20">
-                {getFeedbacksQuery.error instanceof Error
-                    ? getFeedbacksQuery.error.message
-                    : 'Неизвестная ошибка'}
+                {error instanceof Error ? error.message : 'Неизвестная ошибка'}
             </div>
         );
     }
@@ -142,8 +133,8 @@ export function TVNativeTable() {
                         return (
                             <tr
                                 key={virtualRow.key}
-                                data-index={virtualRow.index}
                                 ref={virtualizer.measureElement}
+                                data-index={virtualRow.index}
                                 className="hover:bg-slate-100"
                             >
                                 <td className="text-center p-3 text-sm text-slate-500">
@@ -183,13 +174,13 @@ export function TVNativeTable() {
             </table>
 
             <div className="min-h-10 flex justify-center items-center w-full my-2">
-                {getFeedbacksQuery.isFetchingNextPage && (
+                {isFetchingNextPage && (
                     <span className="text-slate-500 text-sm animate-pulse font-medium">
                         Подгрузка данных...
                     </span>
                 )}
 
-                {!getFeedbacksQuery.hasNextPage && allItems.length > 0 && (
+                {!hasNextPage && allItems.length > 0 && (
                     <span className="text-slate-400 text-sm font-medium">Все записи загружены</span>
                 )}
             </div>

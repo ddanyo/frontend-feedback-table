@@ -22,13 +22,19 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
         countPages: 1,
     });
 
+    const wrappedSetPageSettings: typeof setPageSettings = (updater) => {
+        console.log('%csetPageSettings called', 'color:red;font-weight:bold', updater);
+
+        setPageSettings(updater);
+    };
+
     const value = {
         searchSettings,
         setSearchSettings,
         settings,
         setSettings,
         pageSettings,
-        setPageSettings,
+        setPageSettings: wrappedSetPageSettings,
     };
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

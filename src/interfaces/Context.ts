@@ -1,30 +1,29 @@
+export interface SearchSettings {
+    searchTerm: string;
+    caseSensitive: boolean;
+    wholeWord: boolean;
+}
+
+export interface AppSettings {
+    tanstackTable: boolean;
+    tanstackVirtual: boolean;
+    zustand: boolean;
+    dynamicMode: boolean;
+}
+
+export interface PageSettings {
+    page: number;
+    pageSize: number;
+    countPages: number;
+}
+
 export interface ISettingsContext {
-    searchSettings: {
-        searchTerm: string;
-        caseSensitive: boolean;
-        wholeWord: boolean;
-    };
-    setSearchSettings: (prev: {
-        searchTerm: string;
-        caseSensitive: boolean;
-        wholeWord: boolean;
-    }) => void;
-    settings: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    };
-    setSettings: (prev: {
-        tanstackTable: boolean;
-        tanstackVirtual: boolean;
-        zustand: boolean;
-        dynamicMode: boolean;
-    }) => void;
-    pageSettings: {
-        page: number;
-        pageSize: number;
-        countPages: number;
-    };
-    setPageSettings: (prev: { page: number; pageSize: number; countPages: number }) => void;
+    searchSettings: SearchSettings;
+    setSearchSettings: React.Dispatch<React.SetStateAction<SearchSettings>>;
+
+    settings: AppSettings;
+    setSettings: React.Dispatch<React.SetStateAction<AppSettings>>;
+
+    pageSettings: PageSettings;
+    setPageSettings: React.Dispatch<React.SetStateAction<PageSettings>>;
 }

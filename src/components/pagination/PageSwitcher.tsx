@@ -45,7 +45,10 @@ export function PageSwitcher() {
         }
     }
     function handleNextPage() {
-        setPageSettings({ ...pageSettings, page: pageSettings.page + 1 });
+        setPageSettings((prev) => {
+            if (prev.page >= prev.countPages) return prev;
+            return { ...prev, page: prev.page + 1 };
+        });
     }
 
     return (

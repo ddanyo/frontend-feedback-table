@@ -25,7 +25,9 @@ export function NativeVirtual() {
         queryKey: ['feedbacks', queryParams],
         queryFn: () => getFeedbacks(queryParams),
     });
-    const data = getFeedbacksQuery.data;
+
+    const { data, isFetching, error, isLoading } = getFeedbacksQuery;
+
     const isLastPage = data && data.items.length < pageSettings.pageSize;
 
     useEffect(() => {
@@ -59,18 +61,12 @@ export function NativeVirtual() {
         const element = observerTarget.current;
         const scrollContainer = scrollContainerRef.current;
 
-        if (
-            !element ||
-            !scrollContainer ||
-            getFeedbacksQuery.isFetching ||
-            isLastPage ||
-            getFeedbacksQuery.error
-        )
-            return;
+        if (!element || !scrollContainer || isFetching || isLastPage || error) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
-                if (entries[0].isIntersecting) {
+                const [entry] = entries;
+                if (entry.isIntersecting) {
                     setLocalPage((prev) => prev + 1);
                 }
             },
@@ -86,21 +82,21 @@ export function NativeVirtual() {
         return () => {
             observer.disconnect();
         };
-    }, [getFeedbacksQuery.isFetching, isLastPage, getFeedbacksQuery.error, allItems.length]);
+    }, [isFetching, isLastPage, error, allItems.length]);
 
-    if (getFeedbacksQuery.isLoading && localPage === 1 && allItems.length === 0)
+    if (isLoading && localPage === 1 && allItems.length === 0)
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Загрузка...
             </div>
         );
-    if (getFeedbacksQuery.error)
+    if (error)
         return (
             <div className="flex justify-center text-xl text-red-500 font-medium mt-20">
-                {getFeedbacksQuery.error.message}
+                {error.message}
             </div>
         );
-    if (allItems.length === 0 && !getFeedbacksQuery.isLoading)
+    if (allItems.length === 0 && !isLoading)
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Нет данных для отображения...
@@ -119,13 +115,13 @@ export function NativeVirtual() {
             )}
 
             <div className="min-h-10 flex justify-center items-center w-full my-2">
-                {getFeedbacksQuery.isFetching && (
+                {isFetching && (
                     <span className="text-slate-500 text-sm animate-pulse font-medium">
                         Подгрузка данных...
                     </span>
                 )}
 
-                {isLastPage && !getFeedbacksQuery.isFetching && allItems.length > 0 && (
+                {isLastPage && !isFetching && allItems.length > 0 && (
                     <span className="text-slate-400 text-sm font-medium">Все записи загружены</span>
                 )}
             </div>
