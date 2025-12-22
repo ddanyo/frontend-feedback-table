@@ -1,10 +1,9 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useSettings } from '../context/AppContext';
-import { useDebounceNew } from '../hooks/useDebounce';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 export function Header() {
-    const { searchSettings, setSearchSettings, pageSettings, setPageSettings } = useSettings();
+    const { searchSettings, setSearchSettings } = useSettings();
     function handleSensitiveChange() {
         setSearchSettings({
             ...searchSettings,
@@ -20,16 +19,11 @@ export function Header() {
 
     const [localSearchterm, setLocalSearchterm] = useState('');
 
-    useDebounceNew(() => {
-        setSearchSettings({
-            ...searchSettings,
-            searchTerm: localSearchterm,
+    useEffect(() => {
+        setSearchSettings((prev) => {
+            return { ...prev, searchTerm: localSearchterm };
         });
-        setPageSettings({
-            ...pageSettings,
-            page: 1,
-        });
-    }, 200);
+    }, [localSearchterm, setSearchSettings]);
 
     return (
         <header className="h-24 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">

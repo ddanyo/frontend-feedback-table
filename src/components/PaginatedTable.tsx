@@ -1,5 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useMemo } from 'react';
 import { getFeedbacks } from '../api/feedbacks';
 import { FeedbackSort } from '../constans/FeedbackSort';
 import { type FeedbackResponse } from '../interfaces/Feedback';
@@ -9,7 +9,7 @@ import { PageSwitcher } from './pagination/PageSwitcher';
 import { useSettings } from '../context/AppContext';
 
 export function PaginatedTable() {
-    const { pageSettings, setPageSettings, searchSettings, settings } = useSettings();
+    const { pageSettings, searchSettings, settings } = useSettings();
     const queryParams = useMemo(
         () => ({
             skip: (pageSettings.page - 1) * pageSettings.pageSize,
@@ -35,17 +35,8 @@ export function PaginatedTable() {
     });
     const { data, error, isError, isLoading } = getFeedbacksQuery;
 
-    const items = data?.items || [];
-    const totalPages = data?.totalPages || 0;
-
-    // useEffect(() => {
-    //     if (!totalPages) return;
-
-    //     setPageSettings((prev) => {
-    //         if (prev.countPages === totalPages) return prev;
-    //         return { ...prev, countPages: totalPages };
-    //     });
-    // }, [totalPages, setPageSettings]);
+    const items = useMemo(() => data?.items || [], [data]);
+    const totalPages = useMemo(() => data?.totalPages || 0, [data]);
 
     if (isLoading) {
         return (
@@ -81,7 +72,7 @@ export function PaginatedTable() {
             </div>
 
             <div className="h-6 my-2">
-                <PageSwitcher />
+                <PageSwitcher countPages={totalPages} />
             </div>
         </div>
     );

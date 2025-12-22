@@ -14,7 +14,6 @@ export interface AppSettings {
 export interface PageSettings {
     page: number;
     pageSize: number;
-    countPages: number;
 }
 
 export interface ISettingsContext {

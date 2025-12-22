@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
     ChevronLeft,
     ChevronRight,
@@ -7,14 +7,15 @@ import {
 } from 'lucide-react';
 import { useSettings } from '../../context/AppContext';
 
-export function PageSwitcher() {
+export function PageSwitcher({ countPages }: { countPages: number }) {
     const { pageSettings, setPageSettings } = useSettings();
     const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
 
+    const page = useMemo(() => pageSettings.page, [pageSettings.page]);
+
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLocalPage(pageSettings.page.toString());
-    }, [pageSettings.page]);
+        setLocalPage(page.toString());
+    }, [page]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalPage(e.target.value);
@@ -28,25 +29,28 @@ export function PageSwitcher() {
             return;
         }
 
-        if (numVal > pageSettings.countPages) {
-            numVal = pageSettings.countPages;
+        if (numVal > countPages) {
+            numVal = countPages;
         }
 
         setLocalPage(numVal.toString());
 
-        if (numVal !== pageSettings.page) {
-            setPageSettings({ ...pageSettings, page: numVal });
-        }
+        setPageSettings((prev) => {
+            if (numVal === prev.page) return prev;
+            return { ...prev, page: numVal };
+        });
     };
 
     function handlePrevPage() {
-        if (pageSettings.page > 1) {
-            setPageSettings({ ...pageSettings, page: pageSettings.page - 1 });
-        }
+        setPageSettings((prev) => {
+            if (prev.page <= 1) return prev;
+            return { ...prev, page: prev.page - 1 };
+        });
     }
+
     function handleNextPage() {
         setPageSettings((prev) => {
-            if (prev.page >= prev.countPages) return prev;
+            if (prev.page >= countPages) return prev;
             return { ...prev, page: prev.page + 1 };
         });
     }
@@ -63,7 +67,7 @@ export function PageSwitcher() {
             <input
                 type="number"
                 min={1}
-                max={pageSettings.countPages}
+                max={countPages}
                 inputMode="numeric"
                 value={localPage}
                 onChange={handleInputChange}
@@ -78,7 +82,7 @@ export function PageSwitcher() {
             <button
                 className="flex items-center justify-center text-blue-500 text-3xl bg-none w-8 h-8 rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition hover:bg-slate-200"
                 onClick={handleNextPage}
-                disabled={pageSettings.page === pageSettings.countPages}
+                disabled={pageSettings.page === countPages}
             >
                 <ChevronRight size={30} strokeWidth={2.5} />
             </button>

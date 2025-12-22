@@ -31,32 +31,27 @@ export function useLocalStorage<T>(
         }
     }, [key, value]);
 
-    // useEffect(() => {
-    //     const handleStorageChange = (e: StorageEvent) => {
-    //         // интересует только нужный ключ
-    //         if (e.key !== key || !e.newValue) return;
+    useEffect(() => {
+        const handleStorageChange = (e: StorageEvent) => {
+            if (e.key !== key || !e.newValue || e.newValue === JSON.stringify(value)) return;
 
-    //         // значение в storage уже равно текущему — ничего не делаем
-    //         if (e.newValue === JSON.stringify(value)) return;
+            try {
+                const parsed = JSON.parse(e.newValue);
 
-    //         try {
-    //             const parsed = JSON.parse(e.newValue);
+                setValue((prev: T) => {
+                    if (JSON.stringify(prev) === e.newValue) {
+                        return prev;
+                    }
+                    return parsed;
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        };
 
-    //             // ⚠️ ВАЖНО: обновляем ТОЛЬКО если реально отличается
-    //             setValue((prev: T) => {
-    //                 if (JSON.stringify(prev) === e.newValue) {
-    //                     return prev;
-    //                 }
-    //                 return parsed;
-    //             });
-    //         } catch (error) {
-    //             console.error(error);
-    //         }
-    //     };
-
-    //     window.addEventListener('storage', handleStorageChange);
-    //     return () => window.removeEventListener('storage', handleStorageChange);
-    // }, [key, value]);
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, [key, value]);
 
     return [value, setValue];
 }
