@@ -63,7 +63,7 @@ export function Sidebar() {
             className={`
                 flex flex-col items-center h-[90%] mt-8 ml-4 overflow-hidden
                 transition-all duration-300 ease-in-out relative
-                ${isOpen ? 'w-80 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
+                ${isOpen ? 'w-90 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
             `}
         >
             <div
@@ -85,10 +85,7 @@ export function Sidebar() {
 
             <div
                 className={`
-                    flex flex-col h-full w-80 min-w-[300px]
-                    transition-opacity duration-200 
-                    /* ВАЖНО: overflow-y-auto перенесен СЮДА. Теперь скроллится весь контейнер целиком */
-                    overflow-y-auto overflow-x-hidden
+                    flex flex-col h-full w-full min-w-[300px] transition-opacity duration-200 overflow-y-auto overflow-x-hidden
                     ${isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
                 `}
             >
@@ -110,8 +107,8 @@ export function Sidebar() {
 
                     <div className="flex flex-col flex-1 gap-1.5 mb-8">
                         <span className="text-sm font-medium text-slate-500">1. Режим таблицы</span>
-                        <div className="pl-3 flex items-center justify-between transition">
-                            <span className="text-base font-medium text-slate-700">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
                                 Native Table
                             </span>
                             <Switcher
@@ -123,7 +120,7 @@ export function Sidebar() {
                                     });
                                 }}
                             />
-                            <span className="text-base font-medium text-slate-700">
+                            <span className="text-base font-medium text-slate-700 justify-self-start">
                                 TanStack Table
                             </span>
                         </div>
@@ -131,8 +128,10 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             2. Режим просмотра
                         </span>
-                        <div className="flex items-center justify-between pl-3">
-                            <span className="text-base font-medium text-slate-700">Пагинация</span>
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
+                                Пагинация
+                            </span>
                             <Switcher
                                 enabled={settings.dynamicMode}
                                 onChange={() => {
@@ -146,7 +145,7 @@ export function Sidebar() {
                                     });
                                 }}
                             />
-                            <span className="text-base font-medium text-slate-700">
+                            <span className="text-base font-medium text-slate-700 justify-self-start">
                                 Dynamic Mode
                             </span>
                         </div>
@@ -157,8 +156,10 @@ export function Sidebar() {
                             <span className="text-sm font-medium text-slate-500 mt-0 pl-4">
                                 Режим динамической таблицы
                             </span>
-                            <div className="flex items-center justify-between transition pl-8">
-                                <span className="text-base font-medium text-slate-700">Native</span>
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                                <span className="text-base font-medium text-slate-700 justify-self-end">
+                                    Native
+                                </span>
                                 <Switcher
                                     enabled={settings.tanstackVirtual}
                                     onChange={() =>
@@ -168,7 +169,7 @@ export function Sidebar() {
                                         })
                                     }
                                 />
-                                <span className="text-base font-medium text-slate-700">
+                                <span className="text-base font-medium text-slate-700 justify-self-start">
                                     TanStack Virtual
                                 </span>
                             </div>
@@ -177,8 +178,8 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             3. Режим подгрузки
                         </span>
-                        <div className="flex items-center justify-between pl-3 mb-2">
-                            <span className="text-base font-medium text-slate-700">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-2">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
                                 База данных
                             </span>
                             <Switcher
@@ -190,7 +191,9 @@ export function Sidebar() {
                                     })
                                 }
                             />
-                            <span className="text-base font-medium text-slate-700">Zustand</span>
+                            <span className="text-base font-medium text-slate-700 justify-self-start">
+                                Zustand
+                            </span>
                         </div>
                     </div>
 
