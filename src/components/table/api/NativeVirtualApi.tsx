@@ -1,26 +1,35 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NativeTable } from '../NativeTable';
-import { FeedbackSort } from '../../constans/FeedbackSort';
+import { FeedbackSort } from '../../../constans/FeedbackSort';
 import { TanstackTable } from '../TanstackTable';
-import { getFeedbacks } from '../../api/feedbacks';
-import { useSettings } from '../../context/AppContext';
-import { type Feedback, type FeedbackResponse } from '../../interfaces/Feedback';
+import { getFeedbacks } from '../../../api/feedbacks';
+import { useSettings } from '../../../context/AppContext';
+import { type Feedback, type FeedbackResponse } from '../../../interfaces/Feedback';
 
-export function NativeVirtual() {
+export function NativeVirtualApi() {
     const { pageSettings, searchSettings, settings } = useSettings();
 
     const [localPage, setLocalPage] = useState(1);
     const [allItems, setAllItems] = useState<Feedback[]>([]);
 
-    const queryParams = {
-        skip: (localPage - 1) * pageSettings.pageSize,
-        take: pageSettings.pageSize,
-        search: searchSettings.searchTerm,
-        sortBy: FeedbackSort.NEWEST,
-        caseSensitive: searchSettings.caseSensitive,
-        wholeWord: searchSettings.wholeWord,
-    };
+    const queryParams = useMemo(
+        () => ({
+            skip: (localPage - 1) * pageSettings.pageSize,
+            take: pageSettings.pageSize,
+            search: searchSettings.searchTerm,
+            sortBy: FeedbackSort.NEWEST,
+            caseSensitive: searchSettings.caseSensitive,
+            wholeWord: searchSettings.wholeWord,
+        }),
+        [
+            localPage,
+            pageSettings.pageSize,
+            searchSettings.caseSensitive,
+            searchSettings.searchTerm,
+            searchSettings.wholeWord,
+        ]
+    );
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
         queryFn: () => getFeedbacks(queryParams),

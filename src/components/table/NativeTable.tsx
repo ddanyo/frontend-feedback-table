@@ -1,9 +1,11 @@
-import { StarIcon } from '../components/icons/StarIcon';
-import { type Feedback } from '../interfaces/Feedback';
-import { getHighlightedText } from '../utils/highlight';
-import { useSettings } from '../context/AppContext';
+import { StarIcon } from '../icons/StarIcon';
+import { type Feedback } from '../../interfaces/Feedback';
+import { getHighlightedText } from '../../utils/highlight';
+import { useSettings } from '../../context/AppContext';
 
 export function NativeTable({ data }: { data: Feedback[] }) {
+    console.log('NativeTable');
+
     const { searchSettings } = useSettings();
 
     const formatClockString = (date: Date): string => {

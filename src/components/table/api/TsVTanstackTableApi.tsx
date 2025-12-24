@@ -1,21 +1,21 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-import { FeedbackSort } from '../../constans/FeedbackSort';
+import { FeedbackSort } from '../../../constans/FeedbackSort';
 
-import { getFeedbacks } from '../../api/feedbacks';
-import { useSettings } from '../../context/AppContext';
+import { getFeedbacks } from '../../../api/feedbacks';
+import { useSettings } from '../../../context/AppContext';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { getHighlightedText } from '../../utils/highlight';
+import { getHighlightedText } from '../../../utils/highlight';
 import {
     createColumnHelper,
     flexRender,
     getCoreRowModel,
     useReactTable,
 } from '@tanstack/react-table';
-import type { Feedback } from '../../interfaces/Feedback';
-import { StarIcon } from '../icons/StarIcon';
-import { formatClockString } from '../../utils/formatClockString';
+import type { Feedback } from '../../../interfaces/Feedback';
+import { StarIcon } from '../../icons/StarIcon';
+import { formatClockString } from '../../../utils/formatClockString';
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
     const { searchSettings } = useSettings();
@@ -32,7 +32,7 @@ const FeedbackTextCell = ({ text }: { text: string }) => {
     );
 };
 
-export function TVTanstackTable() {
+export function TsVTanstackTableApi() {
     const { pageSettings, searchSettings } = useSettings();
 
     const tableContainerRef = useRef<HTMLDivElement>(null);

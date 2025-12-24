@@ -5,10 +5,10 @@ import {
     flexRender,
     createColumnHelper,
 } from '@tanstack/react-table';
-import { type Feedback } from '../interfaces/Feedback';
-import { StarIcon } from '../components/icons/StarIcon';
-import { getHighlightedText } from '../utils/highlight';
-import { useSettings } from '../context/AppContext';
+import { type Feedback } from '../../interfaces/Feedback';
+import { StarIcon } from '../icons/StarIcon';
+import { getHighlightedText } from '../../utils/highlight';
+import { useSettings } from '../../context/AppContext';
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
     const { searchSettings } = useSettings();
@@ -26,6 +26,8 @@ const FeedbackTextCell = ({ text }: { text: string }) => {
 };
 
 export function TanstackTable({ data }: { data: Feedback[] }) {
+    console.log('TanstackTable');
+
     const formatClockString = (date: Date): string => {
         if (isNaN(date.getTime())) return '';
         return new Intl.DateTimeFormat('ru-RU', {

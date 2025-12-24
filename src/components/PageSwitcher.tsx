@@ -4,10 +4,12 @@ import {
     ChevronRight,
     // ChevronsLeft,
     // ChevronsRight
-} from 'lucide-react';
-import { useSettings } from '../../context/AppContext';
+} from 'lucide-react'; // ant_material
+import { useSettings } from '../context/AppContext';
 
 export function PageSwitcher({ countPages }: { countPages: number }) {
+    console.log('PageSwitcher');
+
     const { pageSettings, setPageSettings } = useSettings();
     const [localPage, setLocalPage] = useState<string>(pageSettings.page.toString());
 

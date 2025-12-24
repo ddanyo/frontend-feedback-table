@@ -1,15 +1,19 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Switcher } from './Switcher';
 import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
 import { useSettings } from '../context/AppContext';
+import useAppStore from '../store/useAppStore';
 
 export function Sidebar() {
+    console.log('Sidebar');
+
     const { pageSettings, setPageSettings, settings, setSettings } = useSettings();
-    const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
+    const pageSize = useMemo(() => pageSettings.pageSize, [pageSettings.pageSize]);
+    const [localPageSize, setLocalPageSize] = useState<string>(pageSize.toString());
+
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLocalPageSize(pageSettings.pageSize.toString());
-    }, [pageSettings.pageSize]);
+        setLocalPageSize(pageSize.toString());
+    }, [pageSize]);
     const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
@@ -47,6 +51,12 @@ export function Sidebar() {
         }
         setLocalPageSize(numVal.toString());
     };
+
+    useEffect(() => {
+        if (settings.zustand) {
+            useAppStore.getState().loadAll(pageSettings.pageSize);
+        }
+    }, [pageSettings.pageSize, settings.zustand]);
 
     return (
         <aside

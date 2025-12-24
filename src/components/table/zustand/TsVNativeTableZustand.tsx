@@ -1,50 +1,29 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { FeedbackSort } from '../../constans/FeedbackSort';
-import { getFeedbacks } from '../../api/feedbacks';
-import { useSettings } from '../../context/AppContext';
+import { useMemo, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { StarIcon } from '../icons/StarIcon';
-import { formatClockString } from '../../utils/formatClockString';
-import { getHighlightedText } from '../../utils/highlight';
+import { StarIcon } from '../../icons/StarIcon';
+import { formatClockString } from '../../../utils/formatClockString';
+import { getHighlightedText } from '../../../utils/highlight';
+import { useSettings } from '../../../context/AppContext';
+import useAppStore from '../../../store/useAppStore';
 
-export function TVNativeTable() {
-    const { pageSettings, searchSettings } = useSettings();
+export function TsVNativeTableZustand() {
+    console.log('TVNativeTableZustand');
+
+    const { searchSettings } = useSettings();
+
+    const allItems = useAppStore((state) => state.allItems);
+    const searchResults = useAppStore((state) => state.searchResults);
+
+    const items = useMemo(
+        () => (searchResults.length > 0 ? searchResults : allItems),
+        [searchResults, allItems]
+    );
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
-    const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', searchSettings],
-        queryFn: async ({ pageParam }) => {
-            const params = {
-                skip: (pageParam - 1) * pageSettings.pageSize,
-                take: pageSettings.pageSize,
-                search: searchSettings.searchTerm,
-                sortBy: FeedbackSort.NEWEST,
-                caseSensitive: searchSettings.caseSensitive,
-                wholeWord: searchSettings.wholeWord,
-            };
-            return await getFeedbacks(params);
-        },
-        getNextPageParam: (lastPage, _, lastPageParam) => {
-            if (lastPage.total === 0) {
-                return undefined;
-            }
-            return lastPageParam + 1;
-        },
-        initialPageParam: 1,
-    });
-
-    const { data, hasNextPage, isFetchingNextPage, fetchNextPage, error, isError, isLoading } =
-        getFeedbacksQuery;
-
-    const allItems = useMemo(() => {
-        return data?.pages.flatMap((page) => page.items) ?? [];
-    }, [data]);
-
     // eslint-disable-next-line react-hooks/incompatible-library
     const virtualizer = useVirtualizer({
-        count: allItems.length,
+        count: items.length,
         getScrollElement: () => tableContainerRef.current,
         estimateSize: () => 60,
         overscan: 10,
@@ -52,41 +31,13 @@ export function TVNativeTable() {
 
     const virtualItems = virtualizer.getVirtualItems();
 
-    useEffect(() => {
-        const lastItem = virtualItems[virtualItems.length - 1];
-        if (
-            lastItem &&
-            lastItem.index >= allItems.length - 1 &&
-            hasNextPage &&
-            !isFetchingNextPage
-        ) {
-            fetchNextPage();
-        }
-    }, [virtualItems, allItems.length, hasNextPage, isFetchingNextPage, fetchNextPage]);
-
     const paddingTop = virtualItems.length > 0 ? virtualItems[0].start : 0;
     const paddingBottom =
         virtualItems.length > 0
-            ? (virtualizer.getTotalSize() ?? 0) - virtualItems[virtualItems.length - 1].end
+            ? virtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
             : 0;
 
-    if (isLoading) {
-        return (
-            <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
-                Загрузка...
-            </div>
-        );
-    }
-
-    if (isError) {
-        return (
-            <div className="flex justify-center text-xl text-red-500 font-medium mt-20">
-                {error instanceof Error ? error.message : 'Неизвестная ошибка'}
-            </div>
-        );
-    }
-
-    if (allItems.length === 0) {
+    if (items.length === 0) {
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Нет данных для отображения...
@@ -127,7 +78,7 @@ export function TVNativeTable() {
                     )}
 
                     {virtualItems.map((virtualRow) => {
-                        const item = allItems[virtualRow.index];
+                        const item = items[virtualRow.index];
                         if (!item) return null;
 
                         return (
@@ -142,7 +93,13 @@ export function TVNativeTable() {
                                 </td>
                                 <td className="p-3">
                                     <span
-                                        className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                        className={`flex items-center justify-center ${
+                                            item.rating === 5
+                                                ? 'text-green-500'
+                                                : item.rating === 1
+                                                  ? 'text-red-500'
+                                                  : 'text-yellow-500'
+                                        }`}
                                     >
                                         <StarIcon className="w-5 h-5" />
                                         <span className="text-sm text-slate-500 font-medium ml-2">
@@ -174,15 +131,7 @@ export function TVNativeTable() {
             </table>
 
             <div className="min-h-10 flex justify-center items-center w-full my-2">
-                {isFetchingNextPage && (
-                    <span className="text-slate-500 text-sm animate-pulse font-medium">
-                        Подгрузка данных...
-                    </span>
-                )}
-
-                {!hasNextPage && allItems.length > 0 && (
-                    <span className="text-slate-400 text-sm font-medium">Все записи загружены</span>
-                )}
+                <span className="text-slate-400 text-sm font-medium">Все записи загружены</span>
             </div>
         </div>
     );

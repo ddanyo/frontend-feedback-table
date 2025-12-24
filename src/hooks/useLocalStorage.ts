@@ -17,6 +17,7 @@ export function useLocalStorage<T>(
 
     const lastValueStr = useRef(JSON.stringify(value));
 
+    // лучше через слои
     useEffect(() => {
         try {
             const newValueStr = JSON.stringify(value);
@@ -33,7 +34,7 @@ export function useLocalStorage<T>(
 
     useEffect(() => {
         const handleStorageChange = (e: StorageEvent) => {
-            if (e.key !== key || !e.newValue || e.newValue === JSON.stringify(value)) return;
+            if (e.key !== key || !e.newValue || e.newValue === JSON.stringify(value)) return; // stringify -> moment
 
             try {
                 const parsed = JSON.parse(e.newValue);

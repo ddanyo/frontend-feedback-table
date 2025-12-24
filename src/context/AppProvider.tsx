@@ -3,6 +3,9 @@ import { AppContext } from './AppContext';
 import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export const AppProvider = ({ children }: { children: React.ReactNode }) => {
+    console.log('AppProvider');
+
+    // useLocalStorage.settings.get()/set()/update()
     const [settings, setSettings] = useLocalStorage('app-settings', {
         tanstackTable: false,
         tanstackVirtual: false,

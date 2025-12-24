@@ -1,14 +1,16 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getFeedbacks } from '../api/feedbacks';
-import { FeedbackSort } from '../constans/FeedbackSort';
-import { type FeedbackResponse } from '../interfaces/Feedback';
-import { NativeTable } from './NativeTable';
-import { TanstackTable } from './TanstackTable';
-import { PageSwitcher } from './pagination/PageSwitcher';
-import { useSettings } from '../context/AppContext';
+import { getFeedbacks } from '../../../api/feedbacks';
+import { FeedbackSort } from '../../../constans/FeedbackSort';
+import { type FeedbackResponse } from '../../../interfaces/Feedback';
+import { NativeTable } from '../NativeTable';
+import { TanstackTable } from '../TanstackTable';
+import { PageSwitcher } from '../../PageSwitcher';
+import { useSettings } from '../../../context/AppContext';
 
-export function PaginatedTable() {
+export function PaginatedTableApi() {
+    console.log('PaginatedTable');
+
     const { pageSettings, searchSettings, settings } = useSettings();
     const queryParams = useMemo(
         () => ({

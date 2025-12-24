@@ -1,9 +1,12 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useSettings } from '../context/AppContext';
 import { useEffect, useState } from 'react';
+import useAppStore from '../store/useAppStore';
 
 export function Header() {
-    const { searchSettings, setSearchSettings } = useSettings();
+    console.log('Header');
+
+    const { settings, searchSettings, setSearchSettings } = useSettings();
     function handleSensitiveChange() {
         setSearchSettings({
             ...searchSettings,
@@ -18,6 +21,17 @@ export function Header() {
     }
 
     const [localSearchterm, setLocalSearchterm] = useState('');
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newTerm = e.target.value;
+        setLocalSearchterm(e.target.value);
+
+        if (settings.zustand) {
+            useAppStore
+                .getState()
+                .searchLocal(newTerm, searchSettings.caseSensitive, searchSettings.wholeWord);
+        }
+    };
 
     useEffect(() => {
         setSearchSettings((prev) => {
@@ -38,9 +52,7 @@ export function Header() {
                         placeholder="Поиск..."
                         className="grow bg-transparent text-slate-800 text-xl px-4 py-2 border-none focus:outline-none focus:ring-0 placeholder:text-slate-400"
                         value={localSearchterm}
-                        onChange={(e) => {
-                            setLocalSearchterm(e.target.value);
-                        }}
+                        onChange={handleSearchChange}
                     />
 
                     <div className="flex items-center pr-2 gap-1">
