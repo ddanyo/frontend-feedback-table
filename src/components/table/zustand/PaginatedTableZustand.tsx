@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import useAppStore from '../../../store/useZustandStore';
+import useZustandStore from '../../../store/useZustandStore';
 import { useStore } from '../../../store/useStore';
 import { PaginatedTable } from '../PaginatedTable';
 
@@ -8,7 +8,7 @@ export function PaginatedTableZustand() {
 
     const { get: getPageSettings } = useStore.PageSettings();
 
-    const { getPage, isLoading, error, isError } = useAppStore.getState();
+    const { getPage, isLoading, error, isError } = useZustandStore.getState();
     const { items, totalPages } = useMemo(
         () => getPage(getPageSettings().page, getPageSettings().pageSize),
         [getPage, getPageSettings]

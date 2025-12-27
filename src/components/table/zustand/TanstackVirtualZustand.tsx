@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import useAppStore from '../../../store/useZustandStore';
+import useZustandStore from '../../../store/useZustandStore';
 
 import { NativeTable } from '../NativeTable';
 import { useStore } from '../../../store/useStore';
@@ -10,8 +10,8 @@ export function TanstackVirtualZustand() {
     console.log('TVNativeTableZustand');
 
     const { get } = useStore.Settings();
-    const allItems = useAppStore((state) => state.allItems);
-    const searchResults = useAppStore((state) => state.searchResults);
+    const allItems = useZustandStore((state) => state.allItems);
+    const searchResults = useZustandStore((state) => state.searchResults);
 
     const items = useMemo(
         () => (searchResults.length > 0 ? searchResults : allItems),

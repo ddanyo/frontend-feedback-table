@@ -213,6 +213,15 @@ export function Sidebar() {
                                 Zustand
                             </span>
                         </div>
+                        <button
+                            className="text-sm font-medium cursor-pointer text-slate-500 w-35 h-8 hover:bg-slate-200 rounded-lg transition"
+                            onClick={() => {
+                                useZustandStore.getState().loadAll();
+                            }}
+                            // enabled={getSettings().zustand}
+                        >
+                            Обновить данные
+                        </button>
                     </div>
 
                     {!getSettings().dynamicMode && (

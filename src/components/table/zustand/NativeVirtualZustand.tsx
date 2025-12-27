@@ -3,7 +3,7 @@ import { NativeTable } from '../NativeTable';
 import { TanstackTable } from '../TanstackTable';
 import { type Feedback } from '../../../interfaces/Feedback';
 import { useStore } from '../../../store/useStore';
-import useAppStore from '../../../store/useZustandStore';
+import useZustandStore from '../../../store/useZustandStore';
 
 export function NativeVirtualZustand() {
     const { get: getPageSettings } = useStore.PageSettings();
@@ -13,7 +13,7 @@ export function NativeVirtualZustand() {
     const [localPage, setLocalPage] = useState(1);
     const [allItems, setAllItems] = useState<Feedback[]>([]);
 
-    const { error, isLoading } = useAppStore.getState();
+    const { error, isLoading } = useZustandStore.getState();
 
     useEffect(() => {
         setLocalPage(1);
