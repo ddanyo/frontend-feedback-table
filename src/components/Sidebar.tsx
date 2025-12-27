@@ -1,14 +1,20 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Switcher } from './Switcher';
 import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
-import { useSettings } from '../context/AppContext';
-import useAppStore from '../store/useAppStore';
+import useZustandStore from '../store/useZustandStore';
+import { useStore } from '../store/useStore';
 
 export function Sidebar() {
     console.log('Sidebar');
 
-    const { pageSettings, setPageSettings, settings, setSettings } = useSettings();
-    const pageSize = useMemo(() => pageSettings.pageSize, [pageSettings.pageSize]);
+    const {
+        get: getPageSettings,
+        set: setPageSettings,
+        update: updatePageSettings,
+    } = useStore.PageSettings();
+    const { get: getSettings, set: setSettings, update: updateSettings } = useStore.Settings();
+
+    const pageSize = useMemo(() => getPageSettings().pageSize, [getPageSettings]);
     const [localPageSize, setLocalPageSize] = useState<string>(pageSize.toString());
 
     useEffect(() => {
@@ -17,19 +23,27 @@ export function Sidebar() {
     const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
-        if (pageSettings.pageSize >= 10) {
-            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
+        const current = getPageSettings();
+        if (current.pageSize >= 10) {
+            updatePageSettings((prev) => ({
+                ...prev,
+                pageSize: prev.pageSize - 5,
+            }));
         }
-        if (pageSettings.pageSize - 5 < 5) {
-            setPageSettings({ ...pageSettings, pageSize: 5 });
+        if (current.pageSize - 5 < 5) {
+            setPageSettings({ ...current, pageSize: 5 });
         }
     }
     function handleIncreasePageSize() {
-        if (pageSettings.pageSize <= 95) {
-            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
+        const current = getPageSettings();
+        if (current.pageSize <= 95) {
+            updatePageSettings((prev) => ({
+                ...current,
+                pageSize: prev.pageSize + 5,
+            }));
         }
-        if (pageSettings.pageSize + 5 > 100) {
-            setPageSettings({ ...pageSettings, pageSize: 100 });
+        if (current.pageSize + 5 > 100) {
+            setPageSettings({ ...current, pageSize: 100 });
         }
     }
 
@@ -38,25 +52,26 @@ export function Sidebar() {
     };
 
     const handlePageSizeBlur = () => {
+        const current = getPageSettings();
         let numVal = parseInt(localPageSize, 10);
         if (isNaN(numVal) || numVal < 5) {
-            setLocalPageSize(pageSettings.pageSize.toString());
+            setLocalPageSize(current.pageSize.toString());
             return;
         }
         if (numVal > 100) {
             numVal = 100;
         }
-        if (numVal !== pageSettings.pageSize) {
-            setPageSettings({ ...pageSettings, pageSize: numVal });
+        if (numVal !== current.pageSize) {
+            setPageSettings({ ...current, pageSize: numVal });
         }
         setLocalPageSize(numVal.toString());
     };
 
     useEffect(() => {
-        if (settings.zustand) {
-            useAppStore.getState().loadAll(pageSettings.pageSize);
+        if (getSettings().zustand) {
+            useZustandStore.getState().loadAll(getPageSettings().pageSize);
         }
-    }, [pageSettings.pageSize, settings.zustand]);
+    }, [getSettings, getPageSettings]);
 
     return (
         <aside
@@ -112,12 +127,12 @@ export function Sidebar() {
                                 Native Table
                             </span>
                             <Switcher
-                                enabled={settings.tanstackTable}
+                                enabled={getSettings().tanstackTable}
                                 onChange={() => {
-                                    setSettings({
-                                        ...settings,
-                                        tanstackTable: !settings.tanstackTable,
-                                    });
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        tanstackTable: !prev.tanstackTable,
+                                    }));
                                 }}
                             />
                             <span className="text-base font-medium text-slate-700 justify-self-start">
@@ -133,14 +148,15 @@ export function Sidebar() {
                                 Пагинация
                             </span>
                             <Switcher
-                                enabled={settings.dynamicMode}
+                                enabled={getSettings().dynamicMode}
                                 onChange={() => {
-                                    const isDynamicMode = !settings.dynamicMode;
+                                    const current = getSettings();
+                                    const isDynamicMode = !current.dynamicMode;
                                     setSettings({
-                                        ...settings,
+                                        ...current,
                                         dynamicMode: isDynamicMode,
                                         tanstackVirtual: isDynamicMode
-                                            ? settings.tanstackVirtual
+                                            ? current.tanstackVirtual
                                             : false,
                                     });
                                 }}
@@ -151,7 +167,7 @@ export function Sidebar() {
                         </div>
 
                         <div
-                            className={`transition ${!settings.dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
+                            className={`transition ${!getSettings().dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
                         >
                             <span className="text-sm font-medium text-slate-500 mt-0 pl-4">
                                 Режим динамической таблицы
@@ -161,12 +177,12 @@ export function Sidebar() {
                                     Native
                                 </span>
                                 <Switcher
-                                    enabled={settings.tanstackVirtual}
+                                    enabled={getSettings().tanstackVirtual}
                                     onChange={() =>
-                                        setSettings({
-                                            ...settings,
-                                            tanstackVirtual: !settings.tanstackVirtual,
-                                        })
+                                        updateSettings((prev) => ({
+                                            ...prev,
+                                            tanstackVirtual: !prev.tanstackVirtual,
+                                        }))
                                     }
                                 />
                                 <span className="text-base font-medium text-slate-700 justify-self-start">
@@ -183,12 +199,12 @@ export function Sidebar() {
                                 База данных
                             </span>
                             <Switcher
-                                enabled={settings.zustand}
+                                enabled={getSettings().zustand}
                                 onChange={() =>
-                                    setSettings({
-                                        ...settings,
-                                        zustand: !settings.zustand,
-                                    })
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        zustand: !prev.zustand,
+                                    }))
                                 }
                             />
                             <span className="text-base font-medium text-slate-700 justify-self-start">
@@ -197,7 +213,7 @@ export function Sidebar() {
                         </div>
                     </div>
 
-                    {!settings.dynamicMode && (
+                    {!getSettings().dynamicMode && (
                         <div
                             className="
                                 flex flex-col items-center justify-center 
@@ -213,7 +229,7 @@ export function Sidebar() {
                             <div className="flex items-center justify-center gap-2 bg-none h-1/2 rounded-lg">
                                 <button
                                     onClick={handleDecreasePageSize}
-                                    disabled={pageSettings.pageSize === 5}
+                                    disabled={getPageSettings().pageSize === 5}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Minus className="w-6 h-6" strokeWidth={2.5} />
@@ -235,7 +251,7 @@ export function Sidebar() {
                                 />
                                 <button
                                     onClick={handleIncreasePageSize}
-                                    disabled={pageSettings.pageSize === 100}
+                                    disabled={getPageSettings().pageSize === 100}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Plus className="w-6 h-6" strokeWidth={2.5} />

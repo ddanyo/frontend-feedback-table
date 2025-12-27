@@ -1,23 +1,28 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
-import { useSettings } from '../context/AppContext';
-import { useEffect, useState } from 'react';
-import useAppStore from '../store/useAppStore';
+import { useState } from 'react';
+import useAppStore from '../store/useZustandStore';
+import { useStore } from '../store/useStore';
 
 export function Header() {
     console.log('Header');
 
-    const { settings, searchSettings, setSearchSettings } = useSettings();
+    const { get: getSettings } = useStore.Settings();
+    const {
+        get: getSearchSettings,
+        set: setSearchSettings,
+        update: updateSearchSettings,
+    } = useStore.SearchSettings();
     function handleSensitiveChange() {
-        setSearchSettings({
-            ...searchSettings,
-            caseSensitive: !searchSettings.caseSensitive,
-        });
+        updateSearchSettings((prev) => ({
+            ...prev,
+            caseSensitive: !prev.caseSensitive,
+        }));
     }
     function handleWholewordChange() {
-        setSearchSettings({
-            ...searchSettings,
-            wholeWord: !searchSettings.wholeWord,
-        });
+        updateSearchSettings((prev) => ({
+            ...prev,
+            wholeWord: !prev.wholeWord,
+        }));
     }
 
     const [localSearchterm, setLocalSearchterm] = useState('');
@@ -26,18 +31,30 @@ export function Header() {
         const newTerm = e.target.value;
         setLocalSearchterm(e.target.value);
 
-        if (settings.zustand) {
+        const current = getSearchSettings();
+        setSearchSettings({
+            ...current,
+            searchTerm: newTerm,
+        });
+
+        if (getSettings().zustand) {
             useAppStore
                 .getState()
-                .searchLocal(newTerm, searchSettings.caseSensitive, searchSettings.wholeWord);
+                .searchLocal(
+                    newTerm,
+                    getSearchSettings().caseSensitive,
+                    getSearchSettings().wholeWord
+                );
         }
     };
 
-    useEffect(() => {
-        setSearchSettings((prev) => {
-            return { ...prev, searchTerm: localSearchterm };
-        });
-    }, [localSearchterm, setSearchSettings]);
+    // useEffect(() => {
+    //     const current = getSearchSettings();
+    //     setSearchSettings({
+    //         ...current,
+    //         searchTerm: localSearchterm,
+    //     });
+    // }, [getSearchSettings, localSearchterm, setSearchSettings]);
 
     return (
         <header className="h-24 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">
@@ -57,7 +74,7 @@ export function Header() {
 
                     <div className="flex items-center pr-2 gap-1">
                         <button
-                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${searchSettings.caseSensitive ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
+                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${getSearchSettings().caseSensitive ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Поиск с учетом регистра"
                             onClick={handleSensitiveChange}
@@ -65,7 +82,7 @@ export function Header() {
                             <CaseSensitive size={20} />
                         </button>
                         <button
-                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${searchSettings.wholeWord ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
+                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${getSearchSettings().wholeWord ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Поиск слова целиком"
                             onClick={handleWholewordChange}

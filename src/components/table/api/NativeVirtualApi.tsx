@@ -4,31 +4,27 @@ import { NativeTable } from '../NativeTable';
 import { FeedbackSort } from '../../../constans/FeedbackSort';
 import { TanstackTable } from '../TanstackTable';
 import { getFeedbacks } from '../../../api/feedbacks';
-import { useSettings } from '../../../context/AppContext';
 import { type Feedback, type FeedbackResponse } from '../../../interfaces/Feedback';
+import { useStore } from '../../../store/useStore';
 
 export function NativeVirtualApi() {
-    const { pageSettings, searchSettings, settings } = useSettings();
+    const { get: getPageSettings } = useStore.PageSettings();
+    const { get: getSearchSettings } = useStore.SearchSettings();
+    const { get: getSettings } = useStore.Settings();
 
     const [localPage, setLocalPage] = useState(1);
     const [allItems, setAllItems] = useState<Feedback[]>([]);
 
     const queryParams = useMemo(
         () => ({
-            skip: (localPage - 1) * pageSettings.pageSize,
-            take: pageSettings.pageSize,
-            search: searchSettings.searchTerm,
+            skip: (localPage - 1) * getPageSettings().pageSize,
+            take: getPageSettings().pageSize,
+            search: getSearchSettings().searchTerm,
             sortBy: FeedbackSort.NEWEST,
-            caseSensitive: searchSettings.caseSensitive,
-            wholeWord: searchSettings.wholeWord,
+            caseSensitive: getSearchSettings().caseSensitive,
+            wholeWord: getSearchSettings().wholeWord,
         }),
-        [
-            localPage,
-            pageSettings.pageSize,
-            searchSettings.caseSensitive,
-            searchSettings.searchTerm,
-            searchSettings.wholeWord,
-        ]
+        [localPage, getPageSettings, getSearchSettings]
     );
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
@@ -37,23 +33,16 @@ export function NativeVirtualApi() {
 
     const { data, isFetching, error, isLoading } = getFeedbacksQuery;
 
-    const isLastPage = data && data.items.length < pageSettings.pageSize;
+    const isLastPage = data && data.items.length < getPageSettings().pageSize;
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setLocalPage(1);
         setAllItems([]);
-    }, [
-        searchSettings.searchTerm,
-        pageSettings.pageSize,
-        searchSettings.caseSensitive,
-        searchSettings.wholeWord,
-    ]);
+    }, [getPageSettings, getSearchSettings]);
 
     useEffect(() => {
         if (!data?.items || data.items.length === 0) return;
 
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setAllItems((prevItems) => {
             if (localPage === 1) {
                 return data.items;
@@ -117,7 +106,7 @@ export function NativeVirtualApi() {
             ref={scrollContainerRef}
             className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
         >
-            {settings.tanstackTable ? (
+            {getSettings().tanstackTable ? (
                 <TanstackTable data={allItems} />
             ) : (
                 <NativeTable data={allItems} />

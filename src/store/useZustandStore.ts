@@ -21,7 +21,7 @@ type State = {
 };
 
 console.log('useAppStore');
-const useAppStore = create<State>((set, get) => ({
+const useZustandStore = create<State>((set, get) => ({
     allItems: [],
     searchResults: [],
     totalPages: 0,
@@ -85,4 +85,4 @@ const useAppStore = create<State>((set, get) => ({
     },
 }));
 
-export default useAppStore;
+export default useZustandStore;

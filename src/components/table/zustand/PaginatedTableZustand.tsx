@@ -2,18 +2,19 @@ import { useMemo } from 'react';
 import { NativeTable } from '../NativeTable';
 import { TanstackTable } from '../TanstackTable';
 import { PageSwitcher } from '../../PageSwitcher';
-import { useSettings } from '../../../context/AppContext';
-import useAppStore from '../../../store/useAppStore';
+import useAppStore from '../../../store/useZustandStore';
+import { useStore } from '../../../store/useStore';
 
 export function PaginatedTableZustand() {
     console.log('PaginatedTableZustand');
 
-    const { pageSettings, settings } = useSettings();
+    const { get: getPageSettings } = useStore.PageSettings();
+    const { get: getSettings } = useStore.Settings();
 
     const { getPage, isLoading, isError, error } = useAppStore.getState();
     const { items, totalPages } = useMemo(
-        () => getPage(pageSettings.page, pageSettings.pageSize),
-        [getPage, pageSettings.page, pageSettings.pageSize]
+        () => getPage(getPageSettings().page, getPageSettings().pageSize),
+        [getPage, getPageSettings]
     );
 
     if (isLoading) {
@@ -42,7 +43,7 @@ export function PaginatedTableZustand() {
     return (
         <div className="flex flex-col justify-between h-full gap-2">
             <div className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
-                {settings.tanstackTable ? (
+                {getSettings().tanstackTable ? (
                     <TanstackTable data={items} />
                 ) : (
                     <NativeTable data={items} />

@@ -6,28 +6,24 @@ import { type FeedbackResponse } from '../../../interfaces/Feedback';
 import { NativeTable } from '../NativeTable';
 import { TanstackTable } from '../TanstackTable';
 import { PageSwitcher } from '../../PageSwitcher';
-import { useSettings } from '../../../context/AppContext';
+import { useStore } from '../../../store/useStore';
 
 export function PaginatedTableApi() {
     console.log('PaginatedTable');
 
-    const { pageSettings, searchSettings, settings } = useSettings();
+    const { get: getPageSettings } = useStore.PageSettings();
+    const { get: getSearchSettings } = useStore.SearchSettings();
+    const { get: getSettings } = useStore.Settings();
     const queryParams = useMemo(
         () => ({
-            skip: (pageSettings.page - 1) * pageSettings.pageSize,
-            take: pageSettings.pageSize,
-            search: searchSettings.searchTerm,
+            skip: (getPageSettings().page - 1) * getPageSettings().pageSize,
+            take: getPageSettings().pageSize,
+            search: getSearchSettings().searchTerm,
             sortBy: FeedbackSort.NEWEST,
-            caseSensitive: searchSettings.caseSensitive,
-            wholeWord: searchSettings.wholeWord,
+            caseSensitive: getSearchSettings().caseSensitive,
+            wholeWord: getSearchSettings().wholeWord,
         }),
-        [
-            pageSettings.page,
-            pageSettings.pageSize,
-            searchSettings.searchTerm,
-            searchSettings.caseSensitive,
-            searchSettings.wholeWord,
-        ]
+        [getPageSettings, getSearchSettings]
     );
 
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
@@ -66,7 +62,7 @@ export function PaginatedTableApi() {
     return (
         <div className="flex flex-col justify-between h-full gap-2">
             <div className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
-                {settings.tanstackTable ? (
+                {getSettings().tanstackTable ? (
                     <TanstackTable data={items} />
                 ) : (
                     <NativeTable data={items} />

@@ -2,27 +2,28 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { FeedbackSort } from '../../../constans/FeedbackSort';
 import { getFeedbacks } from '../../../api/feedbacks';
-import { useSettings } from '../../../context/AppContext';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { StarIcon } from '../../icons/StarIcon';
 import { formatClockString } from '../../../utils/formatClockString';
 import { getHighlightedText } from '../../../utils/highlight';
+import { useStore } from '../../../store/useStore';
 
 export function TsVNativeTableApi() {
-    const { pageSettings, searchSettings } = useSettings();
+    const { get: getPageSettings } = useStore.PageSettings();
+    const { get: getSearchSettings } = useStore.SearchSettings();
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', searchSettings],
+        queryKey: ['feedbacks', getSearchSettings, getPageSettings],
         queryFn: async ({ pageParam }) => {
             const params = {
-                skip: (pageParam - 1) * pageSettings.pageSize,
-                take: pageSettings.pageSize,
-                search: searchSettings.searchTerm,
+                skip: (pageParam - 1) * getPageSettings().pageSize,
+                take: getPageSettings().pageSize,
+                search: getSearchSettings().searchTerm,
                 sortBy: FeedbackSort.NEWEST,
-                caseSensitive: searchSettings.caseSensitive,
-                wholeWord: searchSettings.wholeWord,
+                caseSensitive: getSearchSettings().caseSensitive,
+                wholeWord: getSearchSettings().wholeWord,
             };
             return await getFeedbacks(params);
         },
@@ -42,7 +43,6 @@ export function TsVNativeTableApi() {
         return data?.pages.flatMap((page) => page.items) ?? [];
     }, [data]);
 
-    // eslint-disable-next-line react-hooks/incompatible-library
     const virtualizer = useVirtualizer({
         count: allItems.length,
         getScrollElement: () => tableContainerRef.current,
@@ -156,9 +156,9 @@ export function TsVNativeTableApi() {
                                 <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
                                     {getHighlightedText(
                                         item.feedback_text,
-                                        searchSettings.searchTerm,
-                                        searchSettings.caseSensitive,
-                                        searchSettings.wholeWord
+                                        getSearchSettings().searchTerm,
+                                        getSearchSettings().caseSensitive,
+                                        getSearchSettings().wholeWord
                                     )}
                                 </td>
                             </tr>

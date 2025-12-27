@@ -1,13 +1,13 @@
-import { useSettings } from '../../context/AppContext';
+import { useStore } from '../../store/useStore';
 import { PaginatedTableApi } from './api/PaginatedTableApi';
 import { PaginatedTableZustand } from './zustand/PaginatedTableZustand';
 
 export function PaginatedTable() {
     console.log('PaginatedTable');
 
-    const { settings } = useSettings();
+    const { get } = useStore.Settings();
 
-    if (settings.zustand) {
+    if (get().zustand) {
         return <PaginatedTableZustand />;
     }
 

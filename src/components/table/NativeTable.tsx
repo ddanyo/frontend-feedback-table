@@ -1,24 +1,13 @@
 import { StarIcon } from '../icons/StarIcon';
 import { type Feedback } from '../../interfaces/Feedback';
 import { getHighlightedText } from '../../utils/highlight';
-import { useSettings } from '../../context/AppContext';
+import { formatClockString } from '../../utils/formatClockString';
+import { useStore } from '../../store/useStore';
 
 export function NativeTable({ data }: { data: Feedback[] }) {
     console.log('NativeTable');
 
-    const { searchSettings } = useSettings();
-
-    const formatClockString = (date: Date): string => {
-        if (isNaN(date.getTime())) return '';
-        return new Intl.DateTimeFormat('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            day: '2-digit',
-            month: '2-digit',
-            weekday: 'long',
-        }).format(date);
-    };
+    const { get } = useStore.SearchSettings();
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
@@ -58,9 +47,9 @@ export function NativeTable({ data }: { data: Feedback[] }) {
                         <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
                             {getHighlightedText(
                                 item.feedback_text,
-                                searchSettings.searchTerm,
-                                searchSettings.caseSensitive,
-                                searchSettings.wholeWord
+                                get().searchTerm,
+                                get().caseSensitive,
+                                get().wholeWord
                             )}
                         </td>
                     </tr>

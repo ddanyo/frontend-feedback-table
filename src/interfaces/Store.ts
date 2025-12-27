@@ -4,7 +4,7 @@ export interface SearchSettings {
     wholeWord: boolean;
 }
 
-export interface AppSettings {
+export interface Settings {
     tanstackTable: boolean;
     tanstackVirtual: boolean;
     zustand: boolean;
@@ -20,8 +20,8 @@ export interface ISettingsContext {
     searchSettings: SearchSettings;
     setSearchSettings: React.Dispatch<React.SetStateAction<SearchSettings>>;
 
-    settings: AppSettings;
-    setSettings: React.Dispatch<React.SetStateAction<AppSettings>>;
+    settings: Settings;
+    setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 
     pageSettings: PageSettings;
     setPageSettings: React.Dispatch<React.SetStateAction<PageSettings>>;

@@ -8,18 +8,18 @@ import {
 import { type Feedback } from '../../interfaces/Feedback';
 import { StarIcon } from '../icons/StarIcon';
 import { getHighlightedText } from '../../utils/highlight';
-import { useSettings } from '../../context/AppContext';
+import { useStore } from '../../store/useStore';
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
-    const { searchSettings } = useSettings();
+    const { get: getSearchSettings } = useStore.SearchSettings();
 
     return (
         <span className="text-slate-600 font-medium">
             {getHighlightedText(
                 text,
-                searchSettings.searchTerm,
-                searchSettings.caseSensitive,
-                searchSettings.wholeWord
+                getSearchSettings().searchTerm,
+                getSearchSettings().caseSensitive,
+                getSearchSettings().wholeWord
             )}
         </span>
     );

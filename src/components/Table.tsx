@@ -1,12 +1,13 @@
 import { PaginatedTable } from './table/PaginatedTable';
-import { useSettings } from '../context/AppContext';
 import { DynamicTable } from './table/DynamicTable';
+import { useStore } from '../store/useStore';
 
 export function Table() {
     console.log('Table');
 
-    const { settings } = useSettings();
-    if (settings.dynamicMode) {
+    const { get } = useStore.Settings();
+
+    if (get().dynamicMode) {
         return <DynamicTable />;
     }
 

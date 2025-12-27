@@ -3,13 +3,13 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { StarIcon } from '../../icons/StarIcon';
 import { formatClockString } from '../../../utils/formatClockString';
 import { getHighlightedText } from '../../../utils/highlight';
-import { useSettings } from '../../../context/AppContext';
-import useAppStore from '../../../store/useAppStore';
+import useAppStore from '../../../store/useZustandStore';
+import { useStore } from '../../../store/useStore';
 
 export function TsVNativeTableZustand() {
     console.log('TVNativeTableZustand');
 
-    const { searchSettings } = useSettings();
+    const { get } = useStore.SearchSettings();
 
     const allItems = useAppStore((state) => state.allItems);
     const searchResults = useAppStore((state) => state.searchResults);
@@ -21,7 +21,6 @@ export function TsVNativeTableZustand() {
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
-    // eslint-disable-next-line react-hooks/incompatible-library
     const virtualizer = useVirtualizer({
         count: items.length,
         getScrollElement: () => tableContainerRef.current,
@@ -113,9 +112,9 @@ export function TsVNativeTableZustand() {
                                 <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
                                     {getHighlightedText(
                                         item.feedback_text,
-                                        searchSettings.searchTerm,
-                                        searchSettings.caseSensitive,
-                                        searchSettings.wholeWord
+                                        get().searchTerm,
+                                        get().caseSensitive,
+                                        get().wholeWord
                                     )}
                                 </td>
                             </tr>

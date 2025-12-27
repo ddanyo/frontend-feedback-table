@@ -4,7 +4,6 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import { FeedbackSort } from '../../../constans/FeedbackSort';
 
 import { getFeedbacks } from '../../../api/feedbacks';
-import { useSettings } from '../../../context/AppContext';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { getHighlightedText } from '../../../utils/highlight';
 import {
@@ -16,37 +15,34 @@ import {
 import type { Feedback } from '../../../interfaces/Feedback';
 import { StarIcon } from '../../icons/StarIcon';
 import { formatClockString } from '../../../utils/formatClockString';
+import { useStore } from '../../../store/useStore';
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
-    const { searchSettings } = useSettings();
+    const { get } = useStore.SearchSettings();
 
     return (
         <span className="text-slate-600 font-medium">
-            {getHighlightedText(
-                text,
-                searchSettings.searchTerm,
-                searchSettings.caseSensitive,
-                searchSettings.wholeWord
-            )}
+            {getHighlightedText(text, get().searchTerm, get().caseSensitive, get().wholeWord)}
         </span>
     );
 };
 
 export function TsVTanstackTableApi() {
-    const { pageSettings, searchSettings } = useSettings();
+    const { get: getPageSettings } = useStore.PageSettings();
+    const { get: getSearchSettings } = useStore.SearchSettings();
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', searchSettings, pageSettings.pageSize],
+        queryKey: ['feedbacks', getSearchSettings, getPageSettings],
         queryFn: async ({ pageParam = 1 }) => {
             const params = {
-                skip: (pageParam - 1) * pageSettings.pageSize,
-                take: pageSettings.pageSize,
-                search: searchSettings.searchTerm,
+                skip: (pageParam - 1) * getPageSettings().pageSize,
+                take: getPageSettings().pageSize,
+                search: getSearchSettings().searchTerm,
                 sortBy: FeedbackSort.NEWEST,
-                caseSensitive: searchSettings.caseSensitive,
-                wholeWord: searchSettings.wholeWord,
+                caseSensitive: getSearchSettings().caseSensitive,
+                wholeWord: getSearchSettings().wholeWord,
             };
             return await getFeedbacks(params);
         },
@@ -67,7 +63,6 @@ export function TsVTanstackTableApi() {
         return data?.pages.flatMap((page) => page.items) ?? [];
     }, [data]);
 
-    // eslint-disable-next-line react-hooks/incompatible-library
     const virtualizer = useVirtualizer({
         count: allItems.length,
         getScrollElement: () => tableContainerRef.current,
