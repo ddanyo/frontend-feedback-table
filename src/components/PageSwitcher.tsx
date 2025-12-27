@@ -1,10 +1,5 @@
 import { useEffect, useState } from 'react';
-import {
-    ChevronLeft,
-    ChevronRight,
-    // ChevronsLeft,
-    // ChevronsRight
-} from 'lucide-react'; // ant_material
+import { ChevronsLeft, ChevronsRight } from 'lucide-react'; // npm install @ant-design/icons@6.1.2 --save
 import { useStore } from '../store/useStore';
 
 export function PageSwitcher({ countPages }: { countPages: number }) {
@@ -64,7 +59,7 @@ export function PageSwitcher({ countPages }: { countPages: number }) {
                 disabled={getPageSettings().page === 1}
                 className="flex items-center justify-center text-blue-500 text-2xl bg-none w-8 h-8 rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition hover:bg-slate-200"
             >
-                <ChevronLeft size={30} strokeWidth={2.5} />
+                <ChevronsLeft size={25} strokeWidth={2.5} />
             </button>
             <input
                 type="number"
@@ -86,7 +81,7 @@ export function PageSwitcher({ countPages }: { countPages: number }) {
                 onClick={handleNextPage}
                 disabled={getPageSettings().page === countPages}
             >
-                <ChevronRight size={30} strokeWidth={2.5} />
+                <ChevronsRight size={25} strokeWidth={2.5} />
             </button>
         </div>
     );

@@ -77,15 +77,15 @@ export function Sidebar() {
         <aside
             className={`
                 flex flex-col items-center h-[90%] mt-8 ml-4 overflow-hidden
-                transition-all duration-300 ease-in-out relative
+                transition-all duration-500 ease-in-out relative
                 ${isOpen ? 'w-90 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
             `}
         >
             <div
                 className={`
                     absolute top-4 left-0 w-full flex justify-center 
-                    transition-opacity duration-200 z-10
-                    ${!isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
+                    transition-opacity duration-400 z-10
+                    ${!isOpen ? 'opacity-100 delay-300' : 'opacity-0 pointer-events-none'}
                 `}
             >
                 <button
@@ -93,6 +93,7 @@ export function Sidebar() {
                     className="p-2 rounded-2xl bg-none text-xl cursor-pointer transition hover:-translate-y-0.5"
                     data-tooltip-id="global-tooltip"
                     data-tooltip-content="Открыть настройки"
+                    data-tooltip-hidden={isOpen}
                 >
                     <Menu size={40} className="text-slate-500" />
                 </button>
@@ -100,7 +101,7 @@ export function Sidebar() {
 
             <div
                 className={`
-                    flex flex-col h-full w-full min-w-[300px] transition-opacity duration-200 overflow-y-auto overflow-x-hidden
+                    flex flex-col h-full w-full min-w-[350px] transition-opacity duration-400 overflow-y-auto overflow-x-hidden
                     ${isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
                 `}
             >
@@ -114,6 +115,7 @@ export function Sidebar() {
                             onClick={() => setIsOpen(false)}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Закрыть настройки"
+                            data-tooltip-hidden={!isOpen}
                             className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                         >
                             <X size={25} />
@@ -122,7 +124,7 @@ export function Sidebar() {
 
                     <div className="flex flex-col flex-1 gap-1.5 mb-8">
                         <span className="text-sm font-medium text-slate-500">1. Режим таблицы</span>
-                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
                             <span className="text-base font-medium text-slate-700 justify-self-end">
                                 Native Table
                             </span>
@@ -143,7 +145,7 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             2. Режим просмотра
                         </span>
-                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
                             <span className="text-base font-medium text-slate-700 justify-self-end">
                                 Пагинация
                             </span>
@@ -172,7 +174,7 @@ export function Sidebar() {
                             <span className="text-sm font-medium text-slate-500 mt-0 pl-4">
                                 Режим динамической таблицы
                             </span>
-                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6">
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
                                 <span className="text-base font-medium text-slate-700 justify-self-end">
                                     Native
                                 </span>
@@ -194,7 +196,7 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             3. Режим подгрузки
                         </span>
-                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-6 mb-2">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5 mb-2">
                             <span className="text-base font-medium text-slate-700 justify-self-end">
                                 База данных
                             </span>
