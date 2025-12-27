@@ -1,4 +1,4 @@
-import { PaginatedTable } from './table/PaginatedTable';
+import { PaginatedTable } from './table/PaginatedTableProvider';
 import { DynamicTable } from './table/DynamicTable';
 import { useStore } from '../store/useStore';
 
