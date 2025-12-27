@@ -26,7 +26,9 @@ export function PaginatedTableApi() {
 
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
-        queryFn: () => getFeedbacks(queryParams),
+        queryFn: async ({ signal }) => {
+            return await getFeedbacks(queryParams, signal);
+        },
         placeholderData: keepPreviousData,
     });
     const { data, error, isError, isLoading } = getFeedbacksQuery;

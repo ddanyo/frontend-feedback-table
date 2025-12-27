@@ -28,7 +28,9 @@ export function NativeVirtualApi() {
     );
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
-        queryFn: () => getFeedbacks(queryParams),
+        queryFn: async ({ signal }) => {
+            return await getFeedbacks(queryParams, signal);
+        },
     });
 
     const { data, isFetching, error, isLoading } = getFeedbacksQuery;

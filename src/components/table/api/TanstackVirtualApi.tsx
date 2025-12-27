@@ -16,7 +16,7 @@ export function TanstackVirtualApi() {
 
     const getFeedbacksQuery = useInfiniteQuery({
         queryKey: ['feedbacks', getSearchSettings, getPageSettings],
-        queryFn: async ({ pageParam }) => {
+        queryFn: async ({ pageParam, signal }) => {
             const params = {
                 skip: (pageParam - 1) * getPageSettings().pageSize,
                 take: getPageSettings().pageSize,
@@ -25,7 +25,7 @@ export function TanstackVirtualApi() {
                 caseSensitive: getSearchSettings().caseSensitive,
                 wholeWord: getSearchSettings().wholeWord,
             };
-            return await getFeedbacks(params);
+            return await getFeedbacks(params, signal);
         },
         getNextPageParam: (lastPage, _, lastPageParam) => {
             if (lastPage.total === 0) {

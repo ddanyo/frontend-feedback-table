@@ -1,10 +1,14 @@
-import axios, { type AxiosResponse } from 'axios';
+import axios from 'axios';
 import { type FeedbackResponse, type GetFeedbacksParams } from '../interfaces/Feedback';
 
-export async function getFeedbacks(params: GetFeedbacksParams): Promise<FeedbackResponse> {
-    return await axios
-        .get('http://localhost:2510/api', {
-            params: params,
-        })
-        .then((res: AxiosResponse<FeedbackResponse>) => res.data);
+export async function getFeedbacks(
+    params: GetFeedbacksParams,
+    signal?: AbortSignal
+): Promise<FeedbackResponse> {
+    const res = await axios.get('http://localhost:2510/api', {
+        params,
+        signal,
+    });
+
+    return res.data;
 }
