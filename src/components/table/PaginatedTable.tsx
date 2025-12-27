@@ -49,7 +49,7 @@ export function PaginatedTable({
                 {getSettings().tanstackTable ? (
                     <TanstackTable data={items} />
                 ) : (
-                    <NativeTable data={items} />
+                    <NativeTable items={items} />
                 )}
             </div>
 

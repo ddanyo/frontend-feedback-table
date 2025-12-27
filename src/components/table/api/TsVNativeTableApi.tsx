@@ -92,7 +92,8 @@ export function TsVNativeTableApi() {
         );
     }
 
-    const visibleItems = virtualItems.map((v) => allItems[v.index]).filter(Boolean);
+    const visibleItems = (virtualItems ?? []).map((v) => allItems[v.index]).filter(Boolean);
+    console.log('visibleItems:', visibleItems);
 
     return (
         <div
