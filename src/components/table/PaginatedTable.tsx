@@ -47,7 +47,7 @@ export function PaginatedTable({
         <div className="flex flex-col justify-between h-full gap-2">
             <div className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white">
                 {getSettings().tanstackTable ? (
-                    <TanstackTable data={items} />
+                    <TanstackTable items={items} />
                 ) : (
                     <NativeTable items={items} />
                 )}

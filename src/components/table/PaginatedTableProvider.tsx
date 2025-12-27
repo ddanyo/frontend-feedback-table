@@ -2,7 +2,7 @@ import { useStore } from '../../store/useStore';
 import { PaginatedTableApi } from './api/PaginatedTableApi';
 import { PaginatedTableZustand } from './zustand/PaginatedTableZustand';
 
-export function PaginatedTable() {
+export function PaginatedTableProvider() {
     console.log('PaginatedTable');
 
     const { get } = useStore.Settings();

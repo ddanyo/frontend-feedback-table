@@ -14,6 +14,7 @@ export function NativeTable({
     paddingBottom?: number;
 }) {
     console.log('NativeTable');
+    console.log('items', items);
 
     const { get } = useStore.SearchSettings();
 
@@ -39,11 +40,11 @@ export function NativeTable({
                 className="bg-white divide-y divide-slate-200"
                 style={{ contain: 'layout paint' }}
             >
-                {paddingTop && paddingTop > 0 && (
+                {paddingTop && paddingTop > 0 ? (
                     <tr>
                         <td style={{ height: `${paddingTop}px` }} colSpan={4} />
                     </tr>
-                )}
+                ) : null}
 
                 {items.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-100">
@@ -72,11 +73,11 @@ export function NativeTable({
                     </tr>
                 ))}
 
-                {paddingBottom && paddingBottom > 0 && (
+                {paddingBottom && paddingBottom > 0 ? (
                     <tr>
                         <td style={{ height: `${paddingBottom}px` }} colSpan={4} />
                     </tr>
-                )}
+                ) : null}
             </tbody>
         </table>
     );

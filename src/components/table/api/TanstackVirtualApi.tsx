@@ -5,10 +5,12 @@ import { getFeedbacks } from '../../../api/feedbacks';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStore } from '../../../store/useStore';
 import { NativeTable } from '../NativeTable';
+import { TanstackTable } from '../TanstackTable';
 
-export function TsVNativeTableApi() {
+export function TanstackVirtualApi() {
     const { get: getPageSettings } = useStore.PageSettings();
     const { get: getSearchSettings } = useStore.SearchSettings();
+    const { get: getSettings } = useStore.Settings();
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
@@ -93,18 +95,27 @@ export function TsVNativeTableApi() {
     }
 
     const visibleItems = (virtualItems ?? []).map((v) => allItems[v.index]).filter(Boolean);
-    console.log('visibleItems:', visibleItems);
 
     return (
         <div
             ref={tableContainerRef}
             className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
         >
-            <NativeTable
-                items={visibleItems}
-                paddingTop={paddingTop}
-                paddingBottom={paddingBottom}
-            />
+            {getSettings().tanstackTable ? (
+                <TanstackTable
+                    items={allItems}
+                    virtualRows={virtualItems}
+                    paddingTop={paddingTop}
+                    paddingBottom={paddingBottom}
+                    measureElement={virtualizer.measureElement}
+                />
+            ) : (
+                <NativeTable
+                    items={visibleItems}
+                    paddingTop={paddingTop}
+                    paddingBottom={paddingBottom}
+                />
+            )}
 
             <div className="min-h-10 flex justify-center items-center w-full my-2">
                 {isFetchingNextPage && (

@@ -107,9 +107,9 @@ export function NativeVirtualApi() {
             className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
         >
             {getSettings().tanstackTable ? (
-                <TanstackTable data={allItems} />
+                <TanstackTable items={allItems} />
             ) : (
-                <NativeTable data={allItems} />
+                <NativeTable items={allItems} />
             )}
 
             <div className="min-h-10 flex justify-center items-center w-full my-2">

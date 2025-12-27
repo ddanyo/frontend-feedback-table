@@ -9,6 +9,8 @@ import { type Feedback } from '../../interfaces/Feedback';
 import { StarIcon } from '../icons/StarIcon';
 import { getHighlightedText } from '../../utils/highlight';
 import { useStore } from '../../store/useStore';
+import type { VirtualItem } from '@tanstack/react-virtual';
+import { formatClockString } from '../../utils/formatClockString';
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
     const { get: getSearchSettings } = useStore.SearchSettings();
@@ -25,20 +27,20 @@ const FeedbackTextCell = ({ text }: { text: string }) => {
     );
 };
 
-export function TanstackTable({ data }: { data: Feedback[] }) {
+export function TanstackTable({
+    items,
+    virtualRows,
+    paddingTop = 0,
+    paddingBottom = 0,
+    measureElement,
+}: {
+    items: Feedback[];
+    virtualRows?: VirtualItem[];
+    paddingTop?: number;
+    paddingBottom?: number;
+    measureElement?: (el: HTMLElement | null) => void;
+}) {
     console.log('TanstackTable');
-
-    const formatClockString = (date: Date): string => {
-        if (isNaN(date.getTime())) return '';
-        return new Intl.DateTimeFormat('ru-RU', {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            day: '2-digit',
-            month: '2-digit',
-            weekday: 'long',
-        }).format(date);
-    };
 
     const columns = useMemo(() => {
         const columnHelper = createColumnHelper<Feedback>();
@@ -81,12 +83,16 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
 
     // eslint-disable-next-line react-hooks/incompatible-library
     const table = useReactTable({
-        data,
+        data: items,
         columns,
         getCoreRowModel: getCoreRowModel(),
     });
 
     const { rows } = table.getRowModel();
+
+    const rowsToRender = virtualRows
+        ? virtualRows.filter((v) => v.index >= 0 && v.index < rows.length).map((v) => rows[v.index])
+        : rows;
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
@@ -111,8 +117,18 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
                 ))}
             </thead>
             <tbody className="bg-white divide-y divide-slate-200">
-                {rows.map((row) => (
-                    <tr key={row.id} className="hover:bg-slate-100">
+                {paddingTop && paddingTop > 0 ? (
+                    <tr>
+                        <td style={{ height: `${paddingTop}px` }} colSpan={4} />
+                    </tr>
+                ) : null}
+                {rowsToRender.map((row) => (
+                    <tr
+                        key={row.id}
+                        ref={measureElement ?? undefined}
+                        data-index={row.index}
+                        className="hover:bg-slate-100"
+                    >
                         {row.getAllCells().map((cell) => (
                             <td
                                 key={cell.id}
@@ -123,6 +139,11 @@ export function TanstackTable({ data }: { data: Feedback[] }) {
                         ))}
                     </tr>
                 ))}
+                {paddingBottom && paddingBottom > 0 ? (
+                    <tr>
+                        <td style={{ height: `${paddingBottom}px` }} colSpan={4} />
+                    </tr>
+                ) : null}
             </tbody>
         </table>
     );

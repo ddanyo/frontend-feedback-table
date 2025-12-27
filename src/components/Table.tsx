@@ -1,5 +1,5 @@
-import { PaginatedTable } from './table/PaginatedTableProvider';
-import { DynamicTable } from './table/DynamicTable';
+import { PaginatedTableProvider } from './table/PaginatedTableProvider';
+import { DynamicTableProvider } from './table/DynamicTableProvider';
 import { useStore } from '../store/useStore';
 
 export function Table() {
@@ -8,8 +8,8 @@ export function Table() {
     const { get } = useStore.Settings();
 
     if (get().dynamicMode) {
-        return <DynamicTable />;
+        return <DynamicTableProvider />;
     }
 
-    return <PaginatedTable />;
+    return <PaginatedTableProvider />;
 }
