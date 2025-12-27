@@ -4,7 +4,15 @@ import { getHighlightedText } from '../../utils/highlight';
 import { formatClockString } from '../../utils/formatClockString';
 import { useStore } from '../../store/useStore';
 
-export function NativeTable({ data }: { data: Feedback[] }) {
+export function NativeTable({
+    items,
+    paddingTop,
+    paddingBottom,
+}: {
+    items: Feedback[];
+    paddingTop?: number;
+    paddingBottom?: number;
+}) {
     console.log('NativeTable');
 
     const { get } = useStore.SearchSettings();
@@ -27,8 +35,17 @@ export function NativeTable({ data }: { data: Feedback[] }) {
                     </th>
                 </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-slate-200">
-                {data.map((item) => (
+            <tbody
+                className="bg-white divide-y divide-slate-200"
+                style={{ contain: 'layout paint' }}
+            >
+                {paddingTop && paddingTop > 0 && (
+                    <tr>
+                        <td style={{ height: `${paddingTop}px` }} colSpan={4} />
+                    </tr>
+                )}
+
+                {items.map((item) => (
                     <tr key={item.id} className="hover:bg-slate-100">
                         <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
                         <td className="p-3">
@@ -54,6 +71,12 @@ export function NativeTable({ data }: { data: Feedback[] }) {
                         </td>
                     </tr>
                 ))}
+
+                {paddingBottom && paddingBottom > 0 && (
+                    <tr>
+                        <td style={{ height: `${paddingBottom}px` }} colSpan={4} />
+                    </tr>
+                )}
             </tbody>
         </table>
     );
