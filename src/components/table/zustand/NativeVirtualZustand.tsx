@@ -1,31 +1,25 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { NativeTable } from '../NativeTable';
 import { TanstackTable } from '../TanstackTable';
-import { type Feedback } from '../../../interfaces/Feedback';
+
 import { useStore } from '../../../store/useStore';
 import useZustandStore from '../../../store/useZustandStore';
 
 export function NativeVirtualZustand() {
-    const { get: getPageSettings } = useStore.PageSettings();
-    const { get: getSearchSettings } = useStore.SearchSettings();
+    console.log('NativeVirtualZustand');
+
     const { get: getSettings } = useStore.Settings();
 
-    const [localPage, setLocalPage] = useState(1);
-    const [allItems, setAllItems] = useState<Feedback[]>([]);
-
-    const { error, isLoading } = useZustandStore.getState();
-
-    useEffect(() => {
-        setLocalPage(1);
-        setAllItems([]);
-    }, [getPageSettings, getSearchSettings]);
+    const allItems = useZustandStore((state) => state.allItems);
+    const isLoading = useZustandStore((state) => state.isLoading);
+    const error = useZustandStore((state) => state.error);
 
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-    if (isLoading && localPage === 1 && allItems.length === 0)
+    if (isLoading && allItems.length === 0)
         return (
-            <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
-                Загрузка...
+            <div className="flex justify-center text-xl text-slate-500 font-medium animate-pulse mt-20">
+                Загрузка данных...
             </div>
         );
     if (error)

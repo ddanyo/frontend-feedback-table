@@ -7,15 +7,19 @@ import { useStore } from '../../../store/useStore';
 import { TanstackTable } from '../TanstackTable';
 
 export function TanstackVirtualZustand() {
-    console.log('TVNativeTableZustand');
+    console.log('TanstackVirtualZustand');
 
     const { get } = useStore.Settings();
+
     const allItems = useZustandStore((state) => state.allItems);
     const searchResults = useZustandStore((state) => state.searchResults);
+    const isSearching = useZustandStore((state) => state.isSearching);
+    const isLoading = useZustandStore((state) => state.isLoading);
+    const error = useZustandStore((state) => state.error);
 
     const items = useMemo(
-        () => (searchResults.length > 0 ? searchResults : allItems),
-        [searchResults, allItems]
+        () => (isSearching ? searchResults : allItems),
+        [isSearching, searchResults, allItems]
     );
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -35,15 +39,26 @@ export function TanstackVirtualZustand() {
             ? virtualizer.getTotalSize() - virtualItems[virtualItems.length - 1].end
             : 0;
 
-    if (items.length === 0) {
+    if (isLoading && allItems.length === 0)
+        return (
+            <div className="flex justify-center text-xl text-slate-500 font-medium animate-pulse mt-20">
+                Загрузка данных...
+            </div>
+        );
+    if (error)
+        return (
+            <div className="flex justify-center text-xl text-red-500 font-medium mt-20">
+                {error}
+            </div>
+        );
+    if (items.length === 0 && !isLoading)
         return (
             <div className="flex justify-center text-xl text-slate-500 font-medium mt-20">
                 Нет данных для отображения...
             </div>
         );
-    }
 
-    const visibleItems = (virtualItems ?? []).map((v) => allItems[v.index]).filter(Boolean);
+    const visibleItems = (virtualItems ?? []).map((v) => items[v.index]).filter(Boolean);
 
     return (
         <div
@@ -52,7 +67,7 @@ export function TanstackVirtualZustand() {
         >
             {get().tanstackTable ? (
                 <TanstackTable
-                    items={allItems}
+                    items={items}
                     virtualRows={virtualItems ?? []}
                     paddingTop={paddingTop}
                     paddingBottom={paddingBottom}

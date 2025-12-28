@@ -14,7 +14,6 @@ export function NativeTable({
     paddingBottom?: number;
 }) {
     console.log('NativeTable');
-    console.log('items', items);
 
     const { get } = useStore.SearchSettings();
 

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Switcher } from './Switcher';
-import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
+import { Settings, X, Menu, Plus, Minus, RefreshCw } from 'lucide-react';
 import useZustandStore from '../store/useZustandStore';
 import { useStore } from '../store/useStore';
 
@@ -16,6 +16,20 @@ export function Sidebar() {
 
     const pageSize = useMemo(() => getPageSettings().pageSize, [getPageSettings]);
     const [localPageSize, setLocalPageSize] = useState<string>(pageSize.toString());
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        if (isRefreshing || !getSettings().zustand) return;
+
+        setIsRefreshing(true);
+
+        useZustandStore.getState().loadAll();
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+    };
 
     useEffect(() => {
         setLocalPageSize(pageSize.toString());
@@ -66,12 +80,6 @@ export function Sidebar() {
         }
         setLocalPageSize(numVal.toString());
     };
-
-    useEffect(() => {
-        if (getSettings().zustand) {
-            useZustandStore.getState().loadAll(getPageSettings().pageSize);
-        }
-    }, [getSettings, getPageSettings]);
 
     return (
         <aside
@@ -200,6 +208,7 @@ export function Sidebar() {
                             <span className="text-base font-medium text-slate-700 justify-self-end">
                                 База данных
                             </span>
+
                             <Switcher
                                 enabled={getSettings().zustand}
                                 onChange={() =>
@@ -209,19 +218,36 @@ export function Sidebar() {
                                     }))
                                 }
                             />
-                            <span className="text-base font-medium text-slate-700 justify-self-start">
-                                Zustand
-                            </span>
+
+                            <div className="flex items-center gap-4 justify-self-start">
+                                <span className="text-base font-medium text-slate-700">
+                                    Zustand
+                                </span>
+
+                                <button
+                                    onClick={handleRefresh}
+                                    disabled={!getSettings().zustand || isRefreshing}
+                                    className={`
+                p-1.5 rounded-lg transition-all flex items-center justify-center
+                ${
+                    !getSettings().zustand
+                        ? 'text-slate-300 cursor-not-allowed bg-transparent'
+                        : isRefreshing
+                          ? 'text-blue-400 cursor-wait'
+                          : 'text-blue-600 hover:bg-blue-100 cursor-pointer active:scale-95'
+                }
+            `}
+                                    data-tooltip-id="global-tooltip"
+                                    data-tooltip-content="Обновить данные"
+                                    data-tooltip-hidden={!getSettings().zustand || isRefreshing}
+                                >
+                                    <RefreshCw
+                                        size={18}
+                                        className={`transition-transform ${isRefreshing ? 'animate-spin' : ''}`}
+                                    />
+                                </button>
+                            </div>
                         </div>
-                        <button
-                            className="text-sm font-medium cursor-pointer text-slate-500 w-35 h-8 hover:bg-slate-200 rounded-lg transition"
-                            onClick={() => {
-                                useZustandStore.getState().loadAll();
-                            }}
-                            // enabled={getSettings().zustand}
-                        >
-                            Обновить данные
-                        </button>
                     </div>
 
                     {!getSettings().dynamicMode && (

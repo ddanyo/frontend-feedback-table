@@ -6,13 +6,17 @@ import { buildSearchRegex } from '../utils/searchRegex';
 type State = {
     allItems: Feedback[];
     searchResults: Feedback[];
-    totalPages: number;
-    total: number;
+    isSearching: boolean;
+
     isLoading: boolean;
     isError: boolean;
     error?: string | null;
 
-    loadAll: (limit?: number) => Promise<void>;
+    pollingIntervalId: ReturnType<typeof setInterval> | null;
+
+    loadAll: () => Promise<void>;
+    startPolling: (intervalMs?: number) => void;
+    stopPolling: () => void;
     clear: () => void;
 
     getPage: (page: number, pageSize: number) => { items: Feedback[]; totalPages: number };
@@ -24,45 +28,83 @@ console.log('useAppStore');
 const useZustandStore = create<State>((set, get) => ({
     allItems: [],
     searchResults: [],
-    totalPages: 0,
-    total: 0,
+    isSearching: false,
+
     isLoading: false,
     isError: false,
     error: null,
 
-    loadAll: async (pageSize: number = 10) => {
-        set({ isLoading: true, isError: false, error: null });
+    pollingIntervalId: null,
+
+    loadAll: async () => {
+        if (get().allItems.length === 0) {
+            set({ isLoading: true, isError: false, error: null });
+        }
+
         try {
-            const res = await getFeedbacks({});
+            const res = await getFeedbacks({
+                /*take: 'all'*/
+            });
             console.log('API response:', res);
             set({
                 allItems: res.items || [],
-                totalPages: res.totalPages || Math.ceil((res.total || 0) / pageSize),
-                total: res.total || res.items.length,
                 isLoading: false,
+                isError: false,
             });
         } catch (err: unknown) {
             set({
                 isError: true,
                 error: err instanceof Error ? err.message : 'Ошибка загрузки',
+                isLoading: false,
             });
-        } finally {
-            set({ isLoading: false });
         }
     },
-    clear: () => set({ allItems: [], totalPages: 0, total: 0 }),
+
+    startPolling: (intervalMs = 30000) => {
+        const { pollingIntervalId, loadAll } = get();
+        if (pollingIntervalId) return;
+
+        console.log('Polling started');
+
+        loadAll();
+
+        const id = setInterval(() => {
+            console.log('Polling tick...');
+            loadAll();
+        }, intervalMs);
+
+        set({ pollingIntervalId: id });
+    },
+
+    stopPolling: () => {
+        const { pollingIntervalId } = get();
+        if (pollingIntervalId) {
+            clearInterval(pollingIntervalId);
+            set({ pollingIntervalId: null });
+            console.log('Polling stopped');
+        }
+    },
+
+    clear: () => {
+        get().stopPolling();
+        set({ allItems: [], searchResults: [], isSearching: false, isLoading: false });
+    },
 
     getPage: (page, pageSize = 10) => {
-        const items = get().allItems;
+        const { allItems, searchResults, isSearching } = get();
+
+        const source = isSearching ? searchResults : allItems;
+
         const start = (page - 1) * pageSize;
-        const slice = items.slice(start, start + pageSize);
-        const totalPages = Math.ceil(items.length / pageSize);
+        const slice = source.slice(start, start + pageSize);
+
+        const totalPages = Math.ceil(source.length / pageSize);
         return { items: slice, totalPages };
     },
 
-    searchLocal: (query, caseSensitive, wholeWord, pageSize = 10) => {
+    searchLocal: (query, caseSensitive, wholeWord) => {
         if (!query.trim()) {
-            set({ searchResults: [], totalPages: Math.ceil(get().allItems.length / 10) });
+            set({ searchResults: [] });
             return;
         }
 
@@ -76,12 +118,15 @@ const useZustandStore = create<State>((set, get) => ({
 
         set({
             searchResults: filtered,
-            totalPages: Math.ceil(filtered.length / pageSize),
+            isSearching: true,
         });
     },
 
     clearSearch: () => {
-        set({ searchResults: [] });
+        set({
+            searchResults: [],
+            isSearching: false,
+        });
     },
 }));
 
