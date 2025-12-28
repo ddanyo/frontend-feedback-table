@@ -8,10 +8,12 @@ export function NativeTable({
     items,
     paddingTop,
     paddingBottom,
+    measureElement,
 }: {
-    items: Feedback[];
+    items: (Feedback & { virtualIndex?: number })[];
     paddingTop?: number;
     paddingBottom?: number;
+    measureElement?: (node: HTMLElement | null) => void;
 }) {
     console.log('NativeTable');
 
@@ -45,32 +47,39 @@ export function NativeTable({
                     </tr>
                 ) : null}
 
-                {items.map((item) => (
-                    <tr key={item.id} className="hover:bg-slate-100">
-                        <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
-                        <td className="p-3">
-                            <span
-                                className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
-                            >
-                                <StarIcon className="w-5 h-5" />
-                                <span className="text-sm text-slate-500 font-medium ml-2">
-                                    {item.rating}
+                {items.map((item) => {
+                    return (
+                        <tr
+                            key={item.id}
+                            className="hover:bg-slate-100"
+                            ref={measureElement}
+                            data-index={item.virtualIndex}
+                        >
+                            <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
+                            <td className="p-3">
+                                <span
+                                    className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                >
+                                    <StarIcon className="w-5 h-5" />
+                                    <span className="text-sm text-slate-500 font-medium ml-2">
+                                        {item.rating}
+                                    </span>
                                 </span>
-                            </span>
-                        </td>
-                        <td className="text-center p-3 text-sm text-slate-500">
-                            {formatClockString(new Date(item.date_time))}
-                        </td>
-                        <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
-                            {getHighlightedText(
-                                item.feedback_text,
-                                get().searchTerm,
-                                get().caseSensitive,
-                                get().wholeWord
-                            )}
-                        </td>
-                    </tr>
-                ))}
+                            </td>
+                            <td className="text-center p-3 text-sm text-slate-500">
+                                {formatClockString(new Date(item.date_time))}
+                            </td>
+                            <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
+                                {getHighlightedText(
+                                    item.feedback_text,
+                                    get().searchTerm,
+                                    get().caseSensitive,
+                                    get().wholeWord
+                                )}
+                            </td>
+                        </tr>
+                    );
+                })}
 
                 {paddingBottom && paddingBottom > 0 ? (
                     <tr>
