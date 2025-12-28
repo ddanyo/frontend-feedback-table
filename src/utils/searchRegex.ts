@@ -11,7 +11,13 @@ export function buildSearchRegex(
     let pattern = escaped;
 
     if (wholeWord) {
-        pattern = `(?<![\\p{L}\\p{N}_])${pattern}(?![\\p{L}\\p{N}_])`;
+        if (/^[\p{L}\p{N}_]/u.test(query)) {
+            pattern = `(?<![\\p{L}\\p{N}_])${pattern}`;
+        }
+
+        if (/[\p{L}\p{N}_]$/u.test(query)) {
+            pattern = `${pattern}(?![\\p{L}\\p{N}_])`;
+        }
     }
 
     const flags = caseSensitive ? 'u' : 'iu';
@@ -19,9 +25,9 @@ export function buildSearchRegex(
         return new RegExp(`(${pattern})`, flags);
     } catch (e) {
         if (wholeWord) {
-            const asciiPattern = `\\b${escaped}\\b`;
-            return new RegExp(`(${asciiPattern})`, flags);
+            return new RegExp(`(\\b${escaped}\\b)`, flags.replace('u', ''));
         }
-        throw e;
+        console.error('Regex error:', e);
+        return new RegExp(`(${escaped})`, flags.replace('u', ''));
     }
 }
