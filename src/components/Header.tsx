@@ -2,6 +2,7 @@ import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useState } from 'react';
 import useAppStore from '../store/useZustandStore';
 import { useStore } from '../store/useStore';
+import { useDebounce } from '../hooks/useDebounce';
 
 export function Header() {
     console.log('Header');
@@ -12,49 +13,56 @@ export function Header() {
         set: setSearchSettings,
         update: updateSearchSettings,
     } = useStore.SearchSettings();
-    function handleSensitiveChange() {
-        updateSearchSettings((prev) => ({
-            ...prev,
-            caseSensitive: !prev.caseSensitive,
-        }));
-    }
-    function handleWholewordChange() {
-        updateSearchSettings((prev) => ({
-            ...prev,
-            wholeWord: !prev.wholeWord,
-        }));
-    }
 
-    const [localSearchterm, setLocalSearchterm] = useState('');
+    const [localSearchterm, setLocalSearchterm] = useState(getSearchSettings().searchTerm);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newTerm = e.target.value;
         setLocalSearchterm(e.target.value);
+    };
 
-        const current = getSearchSettings();
-        setSearchSettings({
-            ...current,
-            searchTerm: newTerm,
-        });
+    useDebounce(() => {
+        console.log('Debounce triggered:', localSearchterm);
+
+        const currentSearch = getSearchSettings();
+
+        if (currentSearch.searchTerm !== localSearchterm) {
+            setSearchSettings({
+                ...currentSearch,
+                searchTerm: localSearchterm,
+            });
+        }
 
         if (getSettings().zustand) {
             useAppStore
                 .getState()
                 .searchLocal(
-                    newTerm,
+                    localSearchterm,
                     getSearchSettings().caseSensitive,
                     getSearchSettings().wholeWord
                 );
         }
-    };
+    }, 300);
 
-    // useEffect(() => {
-    //     const current = getSearchSettings();
-    //     setSearchSettings({
-    //         ...current,
-    //         searchTerm: localSearchterm,
-    //     });
-    // }, [getSearchSettings, localSearchterm, setSearchSettings]);
+    function handleSensitiveChange() {
+        updateSearchSettings((prev) => {
+            const newVal = !prev.caseSensitive;
+
+            if (getSettings().zustand) {
+                useAppStore.getState().searchLocal(localSearchterm, newVal, prev.wholeWord);
+            }
+            return { ...prev, caseSensitive: newVal };
+        });
+    }
+
+    function handleWholewordChange() {
+        updateSearchSettings((prev) => {
+            const newVal = !prev.wholeWord;
+            if (getSettings().zustand) {
+                useAppStore.getState().searchLocal(localSearchterm, prev.caseSensitive, newVal);
+            }
+            return { ...prev, wholeWord: newVal };
+        });
+    }
 
     return (
         <header className="h-24 border-b-3 border-slate-200 flex items-center justify-between px-6 bg-white">

@@ -104,7 +104,7 @@ const useZustandStore = create<State>((set, get) => ({
 
     searchLocal: (query, caseSensitive, wholeWord) => {
         if (!query.trim()) {
-            set({ searchResults: [] });
+            get().clearSearch();
             return;
         }
 

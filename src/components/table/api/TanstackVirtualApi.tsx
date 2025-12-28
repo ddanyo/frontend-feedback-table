@@ -12,23 +12,29 @@ export function TanstackVirtualApi() {
     const { get: getSearchSettings } = useStore.SearchSettings();
     const { get: getSettings } = useStore.Settings();
 
+    const pageSettings = getPageSettings();
+    const searchSettings = getSearchSettings();
+
+    const { pageSize } = pageSettings;
+    const { searchTerm, caseSensitive, wholeWord } = searchSettings;
+
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', getSearchSettings, getPageSettings],
+        queryKey: ['feedbacks', pageSize, searchTerm, caseSensitive, wholeWord],
         queryFn: async ({ pageParam, signal }) => {
             const params = {
                 skip: (pageParam - 1) * getPageSettings().pageSize,
-                take: getPageSettings().pageSize,
-                search: getSearchSettings().searchTerm,
+                take: pageSize,
+                search: searchTerm,
                 sortBy: FeedbackSort.NEWEST,
-                caseSensitive: getSearchSettings().caseSensitive,
-                wholeWord: getSearchSettings().wholeWord,
+                caseSensitive: caseSensitive,
+                wholeWord: wholeWord,
             };
             return await getFeedbacks(params, signal);
         },
         getNextPageParam: (lastPage, _, lastPageParam) => {
-            if (lastPage.total === 0) {
+            if (lastPage.items.length < pageSize) {
                 return undefined;
             }
             return lastPageParam + 1;
