@@ -3,6 +3,78 @@ import { type Feedback } from '../../interfaces/Feedback';
 import { getHighlightedText } from '../../utils/highlight';
 import { formatClockString } from '../../utils/formatClockString';
 import { useStore } from '../../store/useStore';
+import { useLayoutEffect, useRef, useState } from 'react';
+
+const FeedbackTextCell = ({
+    text,
+    searchTerm,
+    caseSensitive,
+    wholeWord,
+}: {
+    text: string;
+    searchTerm: string;
+    caseSensitive: boolean;
+    wholeWord: boolean;
+}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const textRef = useRef<HTMLDivElement>(null);
+
+    const MAX_COLLAPSED_HEIGHT_EM = 4.5;
+
+    useLayoutEffect(() => {
+        if (textRef.current) {
+            const scrollH = textRef.current.scrollHeight;
+            setContentHeight(scrollH);
+
+            const style = window.getComputedStyle(textRef.current);
+            const fontSize = parseFloat(style.fontSize);
+            const maxAllowedHeightPx = fontSize * 1.5 * 3;
+
+            setIsOverflowing(scrollH > maxAllowedHeightPx + 1);
+        }
+    }, [text, searchTerm]);
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (isExpanded) {
+            containerRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start',
+            });
+        }
+
+        setIsExpanded(!isExpanded);
+    };
+
+    return (
+        <div ref={containerRef} className="flex flex-col items-start scroll-mt-16">
+            <div
+                ref={textRef}
+                className={`text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap overflow-hidden transition-all duration-300 ease-in-out relative`}
+                style={{
+                    maxHeight: isExpanded ? `${contentHeight}px` : `${MAX_COLLAPSED_HEIGHT_EM}em`,
+                    lineHeight: '1.5em',
+                }}
+            >
+                {getHighlightedText(text, searchTerm, caseSensitive, wholeWord)}
+            </div>
+
+            {isOverflowing && (
+                <button
+                    onClick={handleToggle}
+                    className="mt-1 text-xs font-semibold text-blue-600 hover:text-blue-800 focus:outline-none transition-colors"
+                >
+                    {isExpanded ? 'Скрыть' : 'Подробнее...'}
+                </button>
+            )}
+        </div>
+    );
+};
 
 export function NativeTable({
     items,
@@ -51,7 +123,7 @@ export function NativeTable({
                     return (
                         <tr
                             key={item.id}
-                            className="hover:bg-slate-100"
+                            className="hover:bg-slate-100 align-middle"
                             ref={measureElement}
                             data-index={item.virtualIndex}
                         >
@@ -69,13 +141,13 @@ export function NativeTable({
                             <td className="text-center p-3 text-sm text-slate-500">
                                 {formatClockString(new Date(item.date_time))}
                             </td>
-                            <td className="text-left p-3 text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap">
-                                {getHighlightedText(
-                                    item.feedback_text,
-                                    get().searchTerm,
-                                    get().caseSensitive,
-                                    get().wholeWord
-                                )}
+                            <td className="text-left p-3">
+                                <FeedbackTextCell
+                                    text={item.feedback_text ?? ''}
+                                    searchTerm={get().searchTerm}
+                                    caseSensitive={get().caseSensitive}
+                                    wholeWord={get().wholeWord}
+                                />
                             </td>
                         </tr>
                     );
