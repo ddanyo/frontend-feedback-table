@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useLayoutEffect } from 'react';
 import {
     useReactTable,
     getCoreRowModel,
@@ -12,18 +12,104 @@ import { useStore } from '../../store/useStore';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { formatClockString } from '../../utils/formatClockString';
 
+const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
+    if (!node) {
+        return null;
+    }
+
+    if (node.scrollHeight > node.clientHeight && node.clientHeight > 0) {
+        const style = getComputedStyle(node);
+        if (
+            style.overflowY === 'auto' ||
+            style.overflowY === 'scroll' ||
+            style.overflow === 'auto' ||
+            style.overflow === 'scroll'
+        ) {
+            return node;
+        }
+    }
+    return getScrollParent(node.parentElement);
+};
+
 const FeedbackTextCell = ({ text }: { text: string }) => {
     const { get: getSearchSettings } = useStore.SearchSettings();
+    const { searchTerm, caseSensitive, wholeWord } = getSearchSettings();
+
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const textRef = useRef<HTMLDivElement>(null);
+
+    const MAX_COLLAPSED_HEIGHT_EM = 4.5;
+
+    useLayoutEffect(() => {
+        if (textRef.current) {
+            const scrollH = textRef.current.scrollHeight;
+            setContentHeight(scrollH);
+
+            const style = window.getComputedStyle(textRef.current);
+            const fontSize = parseFloat(style.fontSize);
+            const maxAllowedHeightPx = fontSize * 1.5 * 3;
+
+            setIsOverflowing(scrollH > maxAllowedHeightPx + 1);
+        }
+    }, [text, searchTerm]);
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (isExpanded) {
+            const container = containerRef.current;
+            const scrollParent = getScrollParent(container);
+
+            if (container && scrollParent) {
+                const rect = container.getBoundingClientRect();
+                const parentRect = scrollParent.getBoundingClientRect();
+
+                const stickyHeaderHeight = 48;
+                const buffer = 20;
+
+                const relativeTop = rect.top - parentRect.top;
+
+                if (relativeTop < stickyHeaderHeight) {
+                    const targetScroll =
+                        scrollParent.scrollTop + relativeTop - stickyHeaderHeight - buffer;
+
+                    scrollParent.scrollTo({
+                        top: targetScroll,
+                        behavior: 'smooth',
+                    });
+                }
+            }
+        }
+
+        setIsExpanded(!isExpanded);
+    };
 
     return (
-        <span className="text-slate-600 font-medium">
-            {getHighlightedText(
-                text,
-                getSearchSettings().searchTerm,
-                getSearchSettings().caseSensitive,
-                getSearchSettings().wholeWord
+        <div ref={containerRef} className="flex flex-col items-start relative">
+            <div
+                ref={textRef}
+                className={`text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap overflow-hidden transition-all duration-800 ease-in-out`}
+                style={{
+                    maxHeight: isExpanded ? `${contentHeight}px` : `${MAX_COLLAPSED_HEIGHT_EM}em`,
+                    lineHeight: '1.5em',
+                }}
+            >
+                {getHighlightedText(text, searchTerm, caseSensitive, wholeWord)}
+            </div>
+
+            {isOverflowing && (
+                <button
+                    onClick={handleToggle}
+                    className="mt-1 text-xs font-semibold cursor-pointer text-blue-600 hover:text-blue-800 focus:outline-none transition-colors select-none"
+                >
+                    {isExpanded ? 'Скрыть' : 'Подробнее...'}
+                </button>
             )}
-        </span>
+        </div>
     );
 };
 
@@ -96,7 +182,7 @@ export function TanstackTable({
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
-            <thead className="bg-blue-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
+            <thead className="bg-slate-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
@@ -127,7 +213,7 @@ export function TanstackTable({
                         key={row.id}
                         ref={measureElement ?? undefined}
                         data-index={row.index}
-                        className="hover:bg-slate-100"
+                        className="hover:bg-slate-100 align-middle"
                     >
                         {row.getAllCells().map((cell) => (
                             <td
