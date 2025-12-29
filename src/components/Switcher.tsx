@@ -1,4 +1,6 @@
 export function Switcher({ enabled, onChange }: { enabled: boolean; onChange: () => void }) {
+    console.log('Switcher');
+
     return (
         <div
             onClick={onChange}

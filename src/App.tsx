@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
 
 function App() {
+    console.log('App');
     return (
         <>
             <Tooltip id="global-tooltip" />

@@ -1,31 +1,63 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Switcher } from './Switcher';
-import { Settings, X, Menu, Plus, Minus } from 'lucide-react';
-import { useSettings } from '../context/AppContext';
+import { Settings, X, Menu, Plus, Minus, RefreshCw } from 'lucide-react';
+import useZustandStore from '../store/useZustandStore';
+import { useStore } from '../store/useStore';
 
 export function Sidebar() {
-    const { pageSettings, setPageSettings, settings, setSettings } = useSettings();
-    const [localPageSize, setLocalPageSize] = useState<string>(pageSettings.pageSize.toString());
+    console.log('Sidebar');
+
+    const {
+        get: getPageSettings,
+        set: setPageSettings,
+        update: updatePageSettings,
+    } = useStore.PageSettings();
+    const { get: getSettings, set: setSettings, update: updateSettings } = useStore.Settings();
+
+    const pageSize = useMemo(() => getPageSettings().pageSize, [getPageSettings]);
+    const [localPageSize, setLocalPageSize] = useState<string>(pageSize.toString());
+
+    const [isRefreshing, setIsRefreshing] = useState(false);
+
+    const handleRefresh = async () => {
+        if (isRefreshing || !getSettings().zustand) return;
+
+        setIsRefreshing(true);
+
+        useZustandStore.getState().loadAll();
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 2000);
+    };
+
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLocalPageSize(pageSettings.pageSize.toString());
-    }, [pageSettings.pageSize]);
+        setLocalPageSize(pageSize.toString());
+    }, [pageSize]);
     const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
-        if (pageSettings.pageSize >= 10) {
-            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize - 5 });
+        const current = getPageSettings();
+        if (current.pageSize >= 10) {
+            updatePageSettings((prev) => ({
+                ...prev,
+                pageSize: prev.pageSize - 5,
+            }));
         }
-        if (pageSettings.pageSize - 5 < 5) {
-            setPageSettings({ ...pageSettings, pageSize: 5 });
+        if (current.pageSize - 5 < 5) {
+            setPageSettings({ ...current, pageSize: 5 });
         }
     }
     function handleIncreasePageSize() {
-        if (pageSettings.pageSize <= 95) {
-            setPageSettings({ ...pageSettings, pageSize: pageSettings.pageSize + 5 });
+        const current = getPageSettings();
+        if (current.pageSize <= 95) {
+            updatePageSettings((prev) => ({
+                ...current,
+                pageSize: prev.pageSize + 5,
+            }));
         }
-        if (pageSettings.pageSize + 5 > 100) {
-            setPageSettings({ ...pageSettings, pageSize: 100 });
+        if (current.pageSize + 5 > 100) {
+            setPageSettings({ ...current, pageSize: 100 });
         }
     }
 
@@ -34,16 +66,17 @@ export function Sidebar() {
     };
 
     const handlePageSizeBlur = () => {
+        const current = getPageSettings();
         let numVal = parseInt(localPageSize, 10);
         if (isNaN(numVal) || numVal < 5) {
-            setLocalPageSize(pageSettings.pageSize.toString());
+            setLocalPageSize(current.pageSize.toString());
             return;
         }
         if (numVal > 100) {
             numVal = 100;
         }
-        if (numVal !== pageSettings.pageSize) {
-            setPageSettings({ ...pageSettings, pageSize: numVal });
+        if (numVal !== current.pageSize) {
+            setPageSettings({ ...current, pageSize: numVal });
         }
         setLocalPageSize(numVal.toString());
     };
@@ -52,15 +85,15 @@ export function Sidebar() {
         <aside
             className={`
                 flex flex-col items-center h-[90%] mt-8 ml-4 overflow-hidden
-                transition-all duration-300 ease-in-out relative
-                ${isOpen ? 'w-80 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
+                transition-all duration-500 ease-in-out relative
+                ${isOpen ? 'w-90 bg-slate-50 border-2 border-slate-200 rounded-2xl' : 'w-20 bg-white'}
             `}
         >
             <div
                 className={`
                     absolute top-4 left-0 w-full flex justify-center 
-                    transition-opacity duration-200 z-10
-                    ${!isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
+                    transition-opacity duration-400 z-10
+                    ${!isOpen ? 'opacity-100 delay-300' : 'opacity-0 pointer-events-none'}
                 `}
             >
                 <button
@@ -68,6 +101,7 @@ export function Sidebar() {
                     className="p-2 rounded-2xl bg-none text-xl cursor-pointer transition hover:-translate-y-0.5"
                     data-tooltip-id="global-tooltip"
                     data-tooltip-content="Открыть настройки"
+                    data-tooltip-hidden={isOpen}
                 >
                     <Menu size={40} className="text-slate-500" />
                 </button>
@@ -75,10 +109,7 @@ export function Sidebar() {
 
             <div
                 className={`
-                    flex flex-col h-full w-80 min-w-[300px]
-                    transition-opacity duration-200 
-                    /* ВАЖНО: overflow-y-auto перенесен СЮДА. Теперь скроллится весь контейнер целиком */
-                    overflow-y-auto overflow-x-hidden
+                    flex flex-col h-full w-full min-w-[350px] transition-opacity duration-400 overflow-y-auto overflow-x-hidden
                     ${isOpen ? 'opacity-100 delay-100' : 'opacity-0 pointer-events-none'}
                 `}
             >
@@ -92,6 +123,7 @@ export function Sidebar() {
                             onClick={() => setIsOpen(false)}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Закрыть настройки"
+                            data-tooltip-hidden={!isOpen}
                             className="text-slate-400 hover:text-slate-600 hover:bg-slate-200 p-1 rounded-xl transition-colors cursor-pointer"
                         >
                             <X size={25} />
@@ -100,20 +132,20 @@ export function Sidebar() {
 
                     <div className="flex flex-col flex-1 gap-1.5 mb-8">
                         <span className="text-sm font-medium text-slate-500">1. Режим таблицы</span>
-                        <div className="pl-3 flex items-center justify-between transition">
-                            <span className="text-base font-medium text-slate-700">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
                                 Native Table
                             </span>
                             <Switcher
-                                enabled={settings.tanstackTable}
+                                enabled={getSettings().tanstackTable}
                                 onChange={() => {
-                                    setSettings({
-                                        ...settings,
-                                        tanstackTable: !settings.tanstackTable,
-                                    });
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        tanstackTable: !prev.tanstackTable,
+                                    }));
                                 }}
                             />
-                            <span className="text-base font-medium text-slate-700">
+                            <span className="text-base font-medium text-slate-700 justify-self-start">
                                 TanStack Table
                             </span>
                         </div>
@@ -121,44 +153,49 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             2. Режим просмотра
                         </span>
-                        <div className="flex items-center justify-between pl-3">
-                            <span className="text-base font-medium text-slate-700">Пагинация</span>
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
+                                Пагинация
+                            </span>
                             <Switcher
-                                enabled={settings.dynamicMode}
+                                enabled={getSettings().dynamicMode}
                                 onChange={() => {
-                                    const isDynamicMode = !settings.dynamicMode;
+                                    const current = getSettings();
+                                    const isDynamicMode = !current.dynamicMode;
                                     setSettings({
-                                        ...settings,
+                                        ...current,
                                         dynamicMode: isDynamicMode,
                                         tanstackVirtual: isDynamicMode
-                                            ? settings.tanstackVirtual
+                                            ? current.tanstackVirtual
                                             : false,
                                     });
                                 }}
                             />
-                            <span className="text-base font-medium text-slate-700">
+                            <span className="text-base font-medium text-slate-700 justify-self-start">
                                 Dynamic Mode
                             </span>
                         </div>
 
                         <div
-                            className={`transition ${!settings.dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
+                            className={`transition ${!getSettings().dynamicMode ? 'opacity-40 pointer-events-none' : ''}`}
                         >
                             <span className="text-sm font-medium text-slate-500 mt-0 pl-4">
                                 Режим динамической таблицы
                             </span>
-                            <div className="flex items-center justify-between transition pl-8">
-                                <span className="text-base font-medium text-slate-700">Native</span>
+                            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5">
+                                <span className="text-base font-medium text-slate-700 justify-self-end">
+                                    Native
+                                </span>
                                 <Switcher
-                                    enabled={settings.tanstackVirtual}
+                                    enabled={getSettings().tanstackVirtual}
                                     onChange={() =>
-                                        setSettings({
-                                            ...settings,
-                                            tanstackVirtual: !settings.tanstackVirtual,
-                                        })
+                                        updateSettings((prev) => ({
+                                            ...prev,
+                                            tanstackVirtual: !prev.tanstackVirtual,
+                                        }))
                                     }
                                 />
-                                <span className="text-base font-medium text-slate-700">
+                                <span className="text-base font-medium text-slate-700 justify-self-start">
                                     TanStack Virtual
                                 </span>
                             </div>
@@ -167,24 +204,53 @@ export function Sidebar() {
                         <span className="text-sm font-medium text-slate-500 mt-8">
                             3. Режим подгрузки
                         </span>
-                        <div className="flex items-center justify-between pl-3 mb-2">
-                            <span className="text-base font-medium text-slate-700">
+                        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-5 mb-2">
+                            <span className="text-base font-medium text-slate-700 justify-self-end">
                                 База данных
                             </span>
+
                             <Switcher
-                                enabled={settings.zustand}
+                                enabled={getSettings().zustand}
                                 onChange={() =>
-                                    setSettings({
-                                        ...settings,
-                                        zustand: !settings.zustand,
-                                    })
+                                    updateSettings((prev) => ({
+                                        ...prev,
+                                        zustand: !prev.zustand,
+                                    }))
                                 }
                             />
-                            <span className="text-base font-medium text-slate-700">Zustand</span>
+
+                            <div className="flex items-center gap-4 justify-self-start">
+                                <span className="text-base font-medium text-slate-700">
+                                    Zustand
+                                </span>
+
+                                <button
+                                    onClick={handleRefresh}
+                                    disabled={!getSettings().zustand || isRefreshing}
+                                    className={`
+                p-1.5 rounded-lg transition-all flex items-center justify-center
+                ${
+                    !getSettings().zustand
+                        ? 'text-slate-300 cursor-not-allowed bg-transparent'
+                        : isRefreshing
+                          ? 'text-blue-400 cursor-wait'
+                          : 'text-blue-600 hover:bg-blue-100 cursor-pointer active:scale-95'
+                }
+            `}
+                                    data-tooltip-id="global-tooltip"
+                                    data-tooltip-content="Обновить данные"
+                                    data-tooltip-hidden={!getSettings().zustand || isRefreshing}
+                                >
+                                    <RefreshCw
+                                        size={18}
+                                        className={`transition-transform ${isRefreshing ? 'animate-spin' : ''}`}
+                                    />
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    {!settings.dynamicMode && (
+                    {!getSettings().dynamicMode && (
                         <div
                             className="
                                 flex flex-col items-center justify-center 
@@ -200,7 +266,7 @@ export function Sidebar() {
                             <div className="flex items-center justify-center gap-2 bg-none h-1/2 rounded-lg">
                                 <button
                                     onClick={handleDecreasePageSize}
-                                    disabled={pageSettings.pageSize === 5}
+                                    disabled={getPageSettings().pageSize === 5}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Minus className="w-6 h-6" strokeWidth={2.5} />
@@ -222,7 +288,7 @@ export function Sidebar() {
                                 />
                                 <button
                                     onClick={handleIncreasePageSize}
-                                    disabled={pageSettings.pageSize === 100}
+                                    disabled={getPageSettings().pageSize === 100}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Plus className="w-6 h-6" strokeWidth={2.5} />

@@ -1,41 +1,23 @@
-import { type ReactNode } from 'react';
+import type { ReactNode } from 'react';
+import { buildSearchRegex } from '../utils/searchRegex';
 
 export const getHighlightedText = (
     text: string | undefined,
     highlight: string,
-    caseSensitive: boolean = false,
-    wholeWord: boolean = false
+    caseSensitive = false,
+    wholeWord = false
 ): ReactNode => {
     if (!text) return null;
     if (!highlight) return text;
 
-    const escapeReg = (string: string) => {
-        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    };
-
-    let pattern = escapeReg(highlight);
-
-    if (wholeWord) {
-        if (/^[\p{L}\p{N}_]/u.test(highlight)) {
-            pattern = `(?<![\\p{L}\\p{N}_])${pattern}`;
-        }
-
-        if (/[\p{L}\p{N}_]$/u.test(highlight)) {
-            pattern = `${pattern}(?![\\p{L}\\p{N}_])`;
-        }
-    }
-
-    const regexPattern = `(${pattern})`;
-
-    const flags = caseSensitive ? 'gu' : 'giu';
+    const regex = buildSearchRegex(highlight, caseSensitive, wholeWord);
+    if (!regex) return text;
 
     try {
-        const regex = new RegExp(regexPattern, flags);
         const parts = text.split(regex);
-
-        return parts.map((part, index) =>
-            index % 2 === 1 ? (
-                <span key={index} className="bg-blue-200 text-slate-900 rounded-sm">
+        return parts.map((part, i) =>
+            i % 2 === 1 ? (
+                <span key={i} className="bg-blue-200 text-slate-900 rounded-sm">
                     {part}
                 </span>
             ) : (
@@ -43,7 +25,7 @@ export const getHighlightedText = (
             )
         );
     } catch (e) {
-        console.error('Regex error:', e);
+        console.error('Highlight error:', e);
         return text;
     }
 };
