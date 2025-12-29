@@ -3,9 +3,11 @@ import 'react-tooltip/dist/react-tooltip.css';
 import { Header } from './components/Header';
 import { Sidebar } from './components/Sidebar';
 import { Table } from './components/Table';
+import { useDynamicFavicon } from './hooks/useDynamicFavicon';
 
 function App() {
     console.log('App');
+    useDynamicFavicon('/icons/favicon-active.ico', '/icons/favicon-inactive.ico');
     return (
         <>
             <Tooltip id="global-tooltip" />
