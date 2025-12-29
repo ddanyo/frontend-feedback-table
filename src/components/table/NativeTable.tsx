@@ -5,6 +5,26 @@ import { formatClockString } from '../../utils/formatClockString';
 import { useStore } from '../../store/useStore';
 import { useLayoutEffect, useRef, useState } from 'react';
 
+const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
+    if (!node) {
+        return null;
+    }
+
+    if (node.scrollHeight > node.clientHeight && node.clientHeight > 0) {
+        const style = getComputedStyle(node);
+
+        if (
+            style.overflowY === 'auto' ||
+            style.overflowY === 'scroll' ||
+            style.overflow === 'auto' ||
+            style.overflow === 'scroll'
+        ) {
+            return node;
+        }
+    }
+    return getScrollParent(node.parentElement);
+};
+
 const FeedbackTextCell = ({
     text,
     searchTerm,
@@ -32,6 +52,7 @@ const FeedbackTextCell = ({
 
             const style = window.getComputedStyle(textRef.current);
             const fontSize = parseFloat(style.fontSize);
+
             const maxAllowedHeightPx = fontSize * 1.5 * 3;
 
             setIsOverflowing(scrollH > maxAllowedHeightPx + 1);
@@ -42,20 +63,38 @@ const FeedbackTextCell = ({
         e.stopPropagation();
 
         if (isExpanded) {
-            containerRef.current?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-            });
+            const container = containerRef.current;
+            const scrollParent = getScrollParent(container);
+
+            if (container && scrollParent) {
+                const rect = container.getBoundingClientRect();
+                const parentRect = scrollParent.getBoundingClientRect();
+
+                const stickyHeaderHeight = 48;
+                const buffer = 20;
+
+                const relativeTop = rect.top - parentRect.top;
+
+                if (relativeTop < stickyHeaderHeight) {
+                    const targetScroll =
+                        scrollParent.scrollTop + relativeTop - stickyHeaderHeight - buffer;
+
+                    scrollParent.scrollTo({
+                        top: targetScroll,
+                        behavior: 'smooth',
+                    });
+                }
+            }
         }
 
         setIsExpanded(!isExpanded);
     };
 
     return (
-        <div ref={containerRef} className="flex flex-col items-start scroll-mt-16">
+        <div ref={containerRef} className="flex flex-col items-start relative">
             <div
                 ref={textRef}
-                className={`text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap overflow-hidden transition-all duration-300 ease-in-out relative`}
+                className={`text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap overflow-hidden transition-all duration-800 ease-in-out`}
                 style={{
                     maxHeight: isExpanded ? `${contentHeight}px` : `${MAX_COLLAPSED_HEIGHT_EM}em`,
                     lineHeight: '1.5em',
@@ -67,7 +106,7 @@ const FeedbackTextCell = ({
             {isOverflowing && (
                 <button
                     onClick={handleToggle}
-                    className="mt-1 text-xs font-semibold text-blue-600 hover:text-blue-800 focus:outline-none transition-colors"
+                    className="mt-1 text-xs font-semibold text-blue-600 hover:text-blue-800 cursor-pointer focus:outline-none transition-colors select-none"
                 >
                     {isExpanded ? 'Скрыть' : 'Подробнее...'}
                 </button>
