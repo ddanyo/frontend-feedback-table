@@ -104,7 +104,7 @@ const FeedbackTextCell = ({ text }: { text: string }) => {
             {isOverflowing && (
                 <button
                     onClick={handleToggle}
-                    className="mt-1 text-xs font-semibold cursor-pointer text-blue-600 hover:text-blue-800 focus:outline-none transition-colors select-none"
+                    className="mt-1 text-slate-400 text-sm font-medium hover:text-slate-600 cursor-pointer focus:outline-none transition-colors select-none"
                 >
                     {isExpanded ? 'Скрыть' : 'Подробнее...'}
                 </button>
