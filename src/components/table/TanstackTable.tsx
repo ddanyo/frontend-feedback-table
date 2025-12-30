@@ -182,7 +182,7 @@ export function TanstackTable({
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
-            <thead className="bg-slate-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
+            <thead className="bg-blue-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
                 {table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
                         {headerGroup.headers.map((header) => (
