@@ -1,29 +1,27 @@
-import { useState } from 'react';
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
-import './App.css';
+import { Tooltip } from 'react-tooltip';
+import 'react-tooltip/dist/react-tooltip.css';
+import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
+import { Table } from './components/Table';
+import { useDynamicFavicon } from './hooks/useDynamicFavicon';
 
 function App() {
-    const [count, setCount] = useState(0);
-
+    console.log('App');
+    useDynamicFavicon('/icons/favicon-active.ico', '/icons/favicon-inactive.ico');
     return (
         <>
-            <div>
-                <a href="https://vite.dev" target="_blank">
-                    <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank">
-                    <img src={reactLogo} className="logo react" alt="React logo" />
-                </a>
+            <Tooltip id="global-tooltip" />
+            <div className="h-screen w-full bg-white flex flex-col">
+                <Header />
+                <div className="flex flex-1 overflow-hidden pb-6">
+                    <Sidebar />
+                    <main className="flex flex-col flex-1 items-center px-6 pt-8">
+                        <div className="flex flex-col items-center h-full w-[80%] overflow-hidden">
+                            <Table />
+                        </div>
+                    </main>
+                </div>
             </div>
-            <h1>Vite + React</h1>
-            <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className="read-the-docs">Click on the Vite and React logos to learn more</p>
         </>
     );
 }

@@ -1,0 +1,203 @@
+import { StarIcon } from '../icons/StarIcon';
+import { type Feedback } from '../../interfaces/Feedback';
+import { getHighlightedText } from '../../utils/highlight';
+import { formatClockString } from '../../utils/formatClockString';
+import { useStore } from '../../store/useStore';
+import { useLayoutEffect, useRef, useState } from 'react';
+
+const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
+    if (!node) {
+        return null;
+    }
+
+    if (node.scrollHeight > node.clientHeight && node.clientHeight > 0) {
+        const style = getComputedStyle(node);
+
+        if (
+            style.overflowY === 'auto' ||
+            style.overflowY === 'scroll' ||
+            style.overflow === 'auto' ||
+            style.overflow === 'scroll'
+        ) {
+            return node;
+        }
+    }
+    return getScrollParent(node.parentElement);
+};
+
+const FeedbackTextCell = ({
+    text,
+    searchTerm,
+    caseSensitive,
+    wholeWord,
+}: {
+    text: string;
+    searchTerm: string;
+    caseSensitive: boolean;
+    wholeWord: boolean;
+}) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+    const [contentHeight, setContentHeight] = useState<number>(0);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const textRef = useRef<HTMLDivElement>(null);
+
+    const MAX_COLLAPSED_HEIGHT_EM = 4.5;
+
+    useLayoutEffect(() => {
+        if (textRef.current) {
+            const scrollH = textRef.current.scrollHeight;
+            setContentHeight(scrollH);
+
+            const style = window.getComputedStyle(textRef.current);
+            const fontSize = parseFloat(style.fontSize);
+
+            const maxAllowedHeightPx = fontSize * 1.5 * 3;
+
+            setIsOverflowing(scrollH > maxAllowedHeightPx + 1);
+        }
+    }, [text, searchTerm]);
+
+    const handleToggle = (e: React.MouseEvent) => {
+        e.stopPropagation();
+
+        if (isExpanded) {
+            const container = containerRef.current;
+            const scrollParent = getScrollParent(container);
+
+            if (container && scrollParent) {
+                const rect = container.getBoundingClientRect();
+                const parentRect = scrollParent.getBoundingClientRect();
+
+                const stickyHeaderHeight = 48;
+                const buffer = 20;
+
+                const relativeTop = rect.top - parentRect.top;
+
+                if (relativeTop < stickyHeaderHeight) {
+                    const targetScroll =
+                        scrollParent.scrollTop + relativeTop - stickyHeaderHeight - buffer;
+
+                    scrollParent.scrollTo({
+                        top: targetScroll,
+                        behavior: 'smooth',
+                    });
+                }
+            }
+        }
+
+        setIsExpanded(!isExpanded);
+    };
+
+    return (
+        <div ref={containerRef} className="flex flex-col items-start relative">
+            <div
+                ref={textRef}
+                className={`text-slate-600 text-base font-medium wrap-break-word whitespace-pre-wrap overflow-hidden transition-all duration-800 ease-in-out`}
+                style={{
+                    maxHeight: isExpanded ? `${contentHeight}px` : `${MAX_COLLAPSED_HEIGHT_EM}em`,
+                    lineHeight: '1.5em',
+                }}
+            >
+                {getHighlightedText(text, searchTerm, caseSensitive, wholeWord)}
+            </div>
+
+            {isOverflowing && (
+                <button
+                    onClick={handleToggle}
+                    className="mt-1 text-slate-400 text-sm font-medium hover:text-slate-600 cursor-pointer focus:outline-none transition-colors select-none"
+                >
+                    {isExpanded ? 'Скрыть' : 'Подробнее...'}
+                </button>
+            )}
+        </div>
+    );
+};
+
+export function NativeTable({
+    items,
+    paddingTop,
+    paddingBottom,
+    measureElement,
+}: {
+    items: (Feedback & { virtualIndex?: number })[];
+    paddingTop?: number;
+    paddingBottom?: number;
+    measureElement?: (node: HTMLElement | null) => void;
+}) {
+    console.log('NativeTable');
+
+    const { get } = useStore.SearchSettings();
+
+    return (
+        <table className="w-full divide-y divide-slate-100 relative table-fixed">
+            <thead className="bg-slate-100 table-fixed sticky top-0 z-10 shadow-sm h-12">
+                <tr>
+                    <th className="text-center text-sm font-medium text-slate-500 uppercase w-[10%]">
+                        ID
+                    </th>
+                    <th className="text-center text-sm font-medium text-slate-500 uppercase w-[10%]">
+                        Рейтинг
+                    </th>
+                    <th className="text-center text-sm font-medium text-slate-500 uppercase w-[20%]">
+                        Дата
+                    </th>
+                    <th className="text-center text-sm font-medium text-slate-500 uppercase w-[60%]">
+                        Текст отзыва
+                    </th>
+                </tr>
+            </thead>
+            <tbody
+                className="bg-white divide-y divide-slate-200"
+                style={{ contain: 'layout paint' }}
+            >
+                {paddingTop && paddingTop > 0 ? (
+                    <tr>
+                        <td style={{ height: `${paddingTop}px` }} colSpan={4} />
+                    </tr>
+                ) : null}
+
+                {items.map((item) => {
+                    return (
+                        <tr
+                            key={item.id}
+                            className="hover:bg-slate-100 align-middle"
+                            ref={measureElement}
+                            data-index={item.virtualIndex}
+                        >
+                            <td className="text-center p-3 text-sm text-slate-500">#{item.id}</td>
+                            <td className="p-3">
+                                <span
+                                    className={`flex items-center justify-center ${item.rating === 5 ? 'text-green-500' : item.rating === 1 ? 'text-red-500' : 'text-yellow-500'}`}
+                                >
+                                    <StarIcon className="w-5 h-5" />
+                                    <span className="text-sm text-slate-500 font-medium ml-2">
+                                        {item.rating}
+                                    </span>
+                                </span>
+                            </td>
+                            <td className="text-center p-3 text-sm text-slate-500">
+                                {formatClockString(new Date(item.date_time))}
+                            </td>
+                            <td className="text-left p-3">
+                                <FeedbackTextCell
+                                    text={item.feedback_text ?? ''}
+                                    searchTerm={get().searchTerm}
+                                    caseSensitive={get().caseSensitive}
+                                    wholeWord={get().wholeWord}
+                                />
+                            </td>
+                        </tr>
+                    );
+                })}
+
+                {paddingBottom && paddingBottom > 0 ? (
+                    <tr>
+                        <td style={{ height: `${paddingBottom}px` }} colSpan={4} />
+                    </tr>
+                ) : null}
+            </tbody>
+        </table>
+    );
+}
