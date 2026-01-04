@@ -1,6 +1,5 @@
-import { PaginatedTableProvider } from './table/PaginatedTableProvider';
-import { DynamicTableProvider } from './table/DynamicTableProvider';
-import { useStore } from '../store/useStore';
+import { PaginatedTableProvider, DynamicTableProvider } from '@components';
+import { useStore } from '@store';
 
 export function Table() {
     console.log('Table');

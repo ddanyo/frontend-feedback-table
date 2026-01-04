@@ -1,8 +1,7 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useState } from 'react';
-import useAppStore from '../store/useZustandStore';
-import { useStore } from '../store/useStore';
-import { useDebounce } from '../hooks/useDebounce';
+import { useStore, useZustandStore } from '@store';
+import { useDebounce } from '@hooks';
 
 export function Header() {
     console.log('Header');
@@ -33,7 +32,7 @@ export function Header() {
         }
 
         if (getSettings().zustand) {
-            useAppStore
+            useZustandStore
                 .getState()
                 .searchLocal(
                     localSearchterm,
@@ -48,7 +47,7 @@ export function Header() {
             const newVal = !prev.caseSensitive;
 
             if (getSettings().zustand) {
-                useAppStore.getState().searchLocal(localSearchterm, newVal, prev.wholeWord);
+                useZustandStore.getState().searchLocal(localSearchterm, newVal, prev.wholeWord);
             }
             return { ...prev, caseSensitive: newVal };
         });
@@ -58,7 +57,7 @@ export function Header() {
         updateSearchSettings((prev) => {
             const newVal = !prev.wholeWord;
             if (getSettings().zustand) {
-                useAppStore.getState().searchLocal(localSearchterm, prev.caseSensitive, newVal);
+                useZustandStore.getState().searchLocal(localSearchterm, prev.caseSensitive, newVal);
             }
             return { ...prev, wholeWord: newVal };
         });

@@ -1,6 +1,5 @@
-import { useStore } from '../../store/useStore';
-import { PaginatedTableApi } from './api/PaginatedTableApi';
-import { PaginatedTableZustand } from './zustand/PaginatedTableZustand';
+import { useStore } from '@store';
+import { PaginatedTableApi, PaginatedTableZustand } from '@components';
 
 export function PaginatedTableProvider() {
     console.log('PaginatedTable');

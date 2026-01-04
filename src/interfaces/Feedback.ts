@@ -1,4 +1,4 @@
-import { FeedbackSort } from '../constans/FeedbackSort';
+import { FeedbackSort } from '@constants';
 
 export interface Feedback {
     id: string;

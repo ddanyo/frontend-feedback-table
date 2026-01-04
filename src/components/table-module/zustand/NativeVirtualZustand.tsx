@@ -1,9 +1,6 @@
 import { useMemo, useRef, useState, useLayoutEffect, useCallback } from 'react';
-import useZustandStore from '../../../store/useZustandStore';
-
-import { NativeTable } from '../NativeTable';
-import { useStore } from '../../../store/useStore';
-import { TanstackTable } from '../TanstackTable';
+import { NativeTable, TanstackTable } from '@components';
+import { useStore, useZustandStore } from '@store';
 
 interface CustomVirtualItem {
     key: number | string;

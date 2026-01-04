@@ -1,9 +1,7 @@
 import { useEffect } from 'react';
-import { useStore } from '../../../store/useStore';
-import { NativeVirtualZustand } from './NativeVirtualZustand';
-import { TanstackVirtualZustand } from './TanstackVirtualZustand';
-import useZustandStore from '../../../store/useZustandStore';
-import { pollingInterval } from '../../../constans/ZustandConfig';
+import { useStore, useZustandStore } from '@store';
+import { NativeVirtualZustand, TanstackVirtualZustand } from '@components';
+import { pollingInterval } from '@constants';
 
 export function DynamicTableZustand() {
     console.log('DynamicTableZustand');

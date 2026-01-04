@@ -5,12 +5,11 @@ import {
     flexRender,
     createColumnHelper,
 } from '@tanstack/react-table';
-import { type Feedback } from '../../interfaces/Feedback';
-import { StarIcon } from '../icons/StarIcon';
-import { getHighlightedText } from '../../utils/highlight';
-import { useStore } from '../../store/useStore';
+import { type Feedback } from '@interfaces';
+import { StarIcon } from '@components/icons/StarIcon';
+import { useStore } from '@store';
 import type { VirtualItem } from '@tanstack/react-virtual';
-import { formatClockString } from '../../utils/formatClockString';
+import { formatClockString, getHighlightedText } from '@utils';
 
 const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
     if (!node) {

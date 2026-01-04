@@ -1,8 +1,7 @@
-import { StarIcon } from '../icons/StarIcon';
-import { type Feedback } from '../../interfaces/Feedback';
-import { getHighlightedText } from '../../utils/highlight';
-import { formatClockString } from '../../utils/formatClockString';
-import { useStore } from '../../store/useStore';
+import { StarIcon } from '@components/icons/StarIcon';
+import { type Feedback } from '@interfaces';
+import { getHighlightedText, formatClockString } from '@utils';
+import { useStore } from '@store';
 import { useLayoutEffect, useRef, useState } from 'react';
 
 const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {

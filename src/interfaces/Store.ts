@@ -16,13 +16,13 @@ export interface PageSettings {
     pageSize: number;
 }
 
-export interface ISettingsContext {
-    searchSettings: SearchSettings;
-    setSearchSettings: React.Dispatch<React.SetStateAction<SearchSettings>>;
+// export interface ISettingsContext {
+//     searchSettings: SearchSettings;
+//     setSearchSettings: React.Dispatch<React.SetStateAction<SearchSettings>>;
 
-    settings: Settings;
-    setSettings: React.Dispatch<React.SetStateAction<Settings>>;
+//     settings: Settings;
+//     setSettings: React.Dispatch<React.SetStateAction<Settings>>;
 
-    pageSettings: PageSettings;
-    setPageSettings: React.Dispatch<React.SetStateAction<PageSettings>>;
-}
+//     pageSettings: PageSettings;
+//     setPageSettings: React.Dispatch<React.SetStateAction<PageSettings>>;
+// }

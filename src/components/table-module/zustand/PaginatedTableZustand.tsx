@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
-import useZustandStore from '../../../store/useZustandStore';
-import { useStore } from '../../../store/useStore';
-import { PaginatedTable } from '../PaginatedTable';
-import { pollingInterval } from '../../../constans/ZustandConfig';
+import { useStore, useZustandStore } from '@store';
+import { PaginatedTable } from '@components';
+import { pollingInterval } from '@constants';
 
 export function PaginatedTableZustand() {
     console.log('PaginatedTableZustand');
