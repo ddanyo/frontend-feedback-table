@@ -1,9 +1,7 @@
 import { Tooltip } from 'react-tooltip';
 import 'react-tooltip/dist/react-tooltip.css';
-import { Header } from './components/Header';
-import { Sidebar } from './components/Sidebar';
-import { Table } from './components/Table';
-import { useDynamicFavicon } from './hooks/useDynamicFavicon';
+import { Header, Sidebar, Table } from '@components';
+import { useDynamicFavicon } from '@hooks/useDynamicFavicon';
 
 function App() {
     console.log('App');

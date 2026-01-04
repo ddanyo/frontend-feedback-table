@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Switcher } from './Switcher';
+import { Switcher } from '@components';
 import { Settings, X, Menu, Plus, Minus, RefreshCw } from 'lucide-react';
-import useZustandStore from '../store/useZustandStore';
-import { useStore } from '../store/useStore';
+import { useStore, useZustandStore } from '@store';
 
 export function Sidebar() {
     console.log('Sidebar');

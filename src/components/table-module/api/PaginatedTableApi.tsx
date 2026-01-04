@@ -1,10 +1,10 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getFeedbacks } from '../../../api/feedbacks';
-import { FeedbackSort } from '../../../constans/FeedbackSort';
-import { type FeedbackResponse } from '../../../interfaces/Feedback';
-import { useStore } from '../../../store/useStore';
-import { PaginatedTable } from '../PaginatedTable';
+import { getFeedbacks } from '@api';
+import { FeedbackSort } from '@constants';
+import { type FeedbackResponse } from '@interfaces';
+import { useStore } from '@store';
+import { PaginatedTable } from '@components';
 
 export function PaginatedTableApi() {
     console.log('PaginatedTable');

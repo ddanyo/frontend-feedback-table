@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'; // npm install @ant-design/icons@6.1.2 --save
-import { useStore } from '../store/useStore';
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useStore } from '@store';
 
 export function PageSwitcher({ countPages }: { countPages: number }) {
     console.log('PageSwitcher');

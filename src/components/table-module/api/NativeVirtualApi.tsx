@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { NativeTable } from '../NativeTable';
-import { FeedbackSort } from '../../../constans/FeedbackSort';
-import { TanstackTable } from '../TanstackTable';
-import { getFeedbacks } from '../../../api/feedbacks';
-import { type Feedback, type FeedbackResponse } from '../../../interfaces/Feedback';
-import { useStore } from '../../../store/useStore';
+import { FeedbackSort } from '@constants';
+import { TanstackTable, NativeTable } from '@components';
+import { getFeedbacks } from '@api';
+import { type Feedback, type FeedbackResponse } from '@interfaces';
+import { useStore } from '@store';
 
 export function NativeVirtualApi() {
     const { get: getPageSettings } = useStore.PageSettings();
