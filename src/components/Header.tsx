@@ -1,5 +1,5 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useStore } from '@store';
 import { useAddressBar, useDebounce } from '@hooks';
 
@@ -10,6 +10,10 @@ export function Header() {
     const { urlParams, updateUrl } = useAddressBar(get().zustand);
 
     const [localSearchterm, setLocalSearchterm] = useState(urlParams.searchTerm);
+
+    useEffect(() => {
+        setLocalSearchterm(urlParams.searchTerm);
+    }, [urlParams.searchTerm]);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalSearchterm(e.target.value);

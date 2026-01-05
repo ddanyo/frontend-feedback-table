@@ -37,7 +37,7 @@ export const useAddressBar = (useZustand: boolean) => {
                 nextParams.set(key, String(value));
             }
         });
-        setSearchParams(nextParams);
+        setSearchParams(nextParams, { replace: false });
     };
 
     return { urlParams, updateUrl };
