@@ -10,6 +10,7 @@ import { StarIcon } from '@components/icons/StarIcon';
 import { useStore } from '@store';
 import type { VirtualItem } from '@tanstack/react-virtual';
 import { formatClockString, getHighlightedText } from '@utils';
+import { useAddressBar } from '@hooks';
 
 const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
     if (!node) {
@@ -31,8 +32,9 @@ const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
 };
 
 const FeedbackTextCell = ({ text }: { text: string }) => {
-    const { get: getSearchSettings } = useStore.SearchSettings();
-    const { searchTerm, caseSensitive, wholeWord } = getSearchSettings();
+    const { get } = useStore.Settings();
+    const { urlParams } = useAddressBar(get().zustand);
+    const { searchTerm, caseSensitive, wholeWord } = urlParams;
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [isOverflowing, setIsOverflowing] = useState(false);

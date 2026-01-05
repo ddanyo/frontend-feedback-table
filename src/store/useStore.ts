@@ -1,10 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { PageSettings, SearchSettings, Settings } from '../interfaces/Store';
+import type { Settings } from '@interfaces';
 
 const defaults: {
     settings: Settings;
-    searchSettings: SearchSettings;
-    pageSettings: PageSettings;
 } = {
     settings: {
         tanstackTable: false,
@@ -12,21 +10,10 @@ const defaults: {
         zustand: false,
         dynamicMode: false,
     },
-    searchSettings: {
-        searchTerm: '',
-        caseSensitive: false,
-        wholeWord: false,
-    },
-    pageSettings: {
-        page: 1,
-        pageSize: 10,
-    },
 };
 
 const keys = {
     settings: 'app-settings',
-    searchSettings: 'app-search-settings',
-    pageSettings: 'app-page-settings',
 };
 
 function useStoreHook<K extends keyof typeof keys>(
@@ -110,6 +97,4 @@ function useStoreHook<K extends keyof typeof keys>(
 
 export const useStore = {
     Settings: () => useStoreHook('settings'),
-    SearchSettings: () => useStoreHook('searchSettings'),
-    PageSettings: () => useStoreHook('pageSettings'),
 };

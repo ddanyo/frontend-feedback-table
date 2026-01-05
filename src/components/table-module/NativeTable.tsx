@@ -3,6 +3,7 @@ import { type Feedback } from '@interfaces';
 import { getHighlightedText, formatClockString } from '@utils';
 import { useStore } from '@store';
 import { useLayoutEffect, useRef, useState } from 'react';
+import { useAddressBar } from '@hooks';
 
 const getScrollParent = (node: HTMLElement | null): HTMLElement | null => {
     if (!node) {
@@ -127,7 +128,9 @@ export function NativeTable({
 }) {
     console.log('NativeTable');
 
-    const { get } = useStore.SearchSettings();
+    const { get } = useStore.Settings();
+    const { urlParams } = useAddressBar(get().zustand);
+    const { searchTerm, caseSensitive, wholeWord } = urlParams;
 
     return (
         <table className="w-full divide-y divide-slate-100 relative table-fixed">
@@ -182,9 +185,9 @@ export function NativeTable({
                             <td className="text-left p-3">
                                 <FeedbackTextCell
                                     text={item.feedback_text ?? ''}
-                                    searchTerm={get().searchTerm}
-                                    caseSensitive={get().caseSensitive}
-                                    wholeWord={get().wholeWord}
+                                    searchTerm={searchTerm}
+                                    caseSensitive={caseSensitive}
+                                    wholeWord={wholeWord}
                                 />
                             </td>
                         </tr>

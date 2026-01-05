@@ -1,42 +1,35 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
-import { FeedbackSort } from '@constants';
 import { getFeedbacks } from '@api';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { useStore } from '@store';
 import { NativeTable, TanstackTable } from '@components';
+import { useAddressBar } from '@hooks';
 
 export function TanstackVirtualApi() {
-    const { get: getPageSettings } = useStore.PageSettings();
-    const { get: getSearchSettings } = useStore.SearchSettings();
-    const { get: getSettings } = useStore.Settings();
+    console.log('TanstackVirtualApi');
 
-    const pageSettings = getPageSettings();
-    const searchSettings = getSearchSettings();
-
-    const { pageSize } = pageSettings;
-    const { searchTerm, caseSensitive, wholeWord } = searchSettings;
+    const { get } = useStore.Settings();
+    const { urlParams } = useAddressBar(get().zustand);
+    const { searchTerm, caseSensitive, wholeWord, sortBy, pageSize } = urlParams;
 
     const tableContainerRef = useRef<HTMLDivElement>(null);
 
     const getFeedbacksQuery = useInfiniteQuery({
-        queryKey: ['feedbacks', pageSize, searchTerm, caseSensitive, wholeWord],
-        queryFn: async ({ pageParam, signal }) => {
+        queryKey: ['feedbacks', searchTerm, caseSensitive, wholeWord, sortBy, pageSize],
+        queryFn: async ({ pageParam = 1, signal }) => {
             const params = {
-                skip: (pageParam - 1) * getPageSettings().pageSize,
+                skip: (pageParam - 1) * pageSize,
                 take: pageSize,
                 search: searchTerm,
-                sortBy: FeedbackSort.NEWEST,
+                sortBy: sortBy,
                 caseSensitive: caseSensitive,
                 wholeWord: wholeWord,
             };
             return await getFeedbacks(params, signal);
         },
-        getNextPageParam: (lastPage, _, lastPageParam) => {
-            if (lastPage.items.length < pageSize) {
-                return undefined;
-            }
-            return lastPageParam + 1;
+        getNextPageParam: (lastPage, allPages) => {
+            return lastPage.items.length < pageSize ? undefined : allPages.length + 1;
         },
         initialPageParam: 1,
     });
@@ -106,7 +99,7 @@ export function TanstackVirtualApi() {
             ref={tableContainerRef}
             className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
         >
-            {getSettings().tanstackTable ? (
+            {get().tanstackTable ? (
                 <TanstackTable
                     items={allItems}
                     virtualRows={virtualItems}

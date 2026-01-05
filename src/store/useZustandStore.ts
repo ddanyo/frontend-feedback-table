@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { type Feedback } from '../interfaces/Feedback';
-import { getFeedbacks } from '../api/feedbacks';
-import { buildSearchRegex } from '../utils/buildSearchRegex';
+import { type Feedback } from '@interfaces';
+import { getFeedbacks } from '@api';
+import { buildSearchRegex } from '@utils';
 
 type State = {
     allItems: Feedback[];
