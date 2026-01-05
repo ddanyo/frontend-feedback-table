@@ -25,7 +25,6 @@
         "ignoreDeprecations": "6.0",
         "baseUrl": ".",
         "paths": {
-            "@/*": ["src/*"],
             "@components": ["src/components"],
             "@components/*": ["src/components/*"],
             "@hooks": ["src/hooks"],
@@ -34,7 +33,8 @@
             "@constants": ["src/constants"],
             "@interfaces": ["src/interfaces"],
             "@store": ["src/store"],
-            "@utils": ["src/utils"]
+            "@utils": ["src/utils"],
+            "@/*": ["src/*"]
         }
     },
     "include": ["src"]

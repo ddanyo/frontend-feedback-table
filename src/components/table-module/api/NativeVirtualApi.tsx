@@ -1,29 +1,30 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { FeedbackSort } from '@constants';
 import { TanstackTable, NativeTable } from '@components';
 import { getFeedbacks } from '@api';
 import { type Feedback, type FeedbackResponse } from '@interfaces';
 import { useStore } from '@store';
+import { useAddressBar } from '@hooks';
 
 export function NativeVirtualApi() {
-    const { get: getPageSettings } = useStore.PageSettings();
-    const { get: getSearchSettings } = useStore.SearchSettings();
-    const { get: getSettings } = useStore.Settings();
+    console.log('NativeVirtualApi');
 
-    const [localPage, setLocalPage] = useState(1);
     const [allItems, setAllItems] = useState<Feedback[]>([]);
+    const { get } = useStore.Settings();
+    const [localPage, setLocalPage] = useState(1);
+    const { urlParams } = useAddressBar(get().zustand);
 
+    const { searchTerm, caseSensitive, wholeWord, sortBy, pageSize, page } = urlParams;
     const queryParams = useMemo(
         () => ({
-            skip: (localPage - 1) * getPageSettings().pageSize,
-            take: getPageSettings().pageSize,
-            search: getSearchSettings().searchTerm,
-            sortBy: FeedbackSort.NEWEST,
-            caseSensitive: getSearchSettings().caseSensitive,
-            wholeWord: getSearchSettings().wholeWord,
+            skip: (localPage - 1) * pageSize,
+            take: pageSize,
+            search: searchTerm,
+            sortBy: sortBy,
+            caseSensitive: caseSensitive,
+            wholeWord: wholeWord,
         }),
-        [localPage, getPageSettings, getSearchSettings]
+        [caseSensitive, localPage, pageSize, searchTerm, sortBy, wholeWord]
     );
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({
         queryKey: ['feedbacks', queryParams],
@@ -34,24 +35,24 @@ export function NativeVirtualApi() {
 
     const { data, isFetching, error, isLoading } = getFeedbacksQuery;
 
-    const isLastPage = data && data.items.length < getPageSettings().pageSize;
+    const isLastPage = data && data.items.length < pageSize;
 
     useEffect(() => {
         setLocalPage(1);
         setAllItems([]);
-    }, [getPageSettings, getSearchSettings]);
+    }, [urlParams]);
 
     useEffect(() => {
         if (!data?.items || data.items.length === 0) return;
 
         setAllItems((prevItems) => {
-            if (localPage === 1) {
+            if (page === 1) {
                 return data.items;
             }
 
             return [...prevItems, ...data.items];
         });
-    }, [data, localPage]);
+    }, [data, page]);
 
     const observerTarget = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -64,8 +65,7 @@ export function NativeVirtualApi() {
 
         const observer = new IntersectionObserver(
             (entries) => {
-                const [entry] = entries;
-                if (entry.isIntersecting) {
+                if (entries[0].isIntersecting) {
                     setLocalPage((prev) => prev + 1);
                 }
             },
@@ -81,7 +81,7 @@ export function NativeVirtualApi() {
         return () => {
             observer.disconnect();
         };
-    }, [isFetching, isLastPage, error, allItems.length]);
+    }, [isFetching, isLastPage, error, allItems.length, page]);
 
     if (isLoading && localPage === 1 && allItems.length === 0)
         return (
@@ -107,7 +107,7 @@ export function NativeVirtualApi() {
             ref={scrollContainerRef}
             className="flex flex-col overflow-y-auto min-h-0 border-2 border-slate-200 rounded-lg bg-white"
         >
-            {getSettings().tanstackTable ? (
+            {get().tanstackTable ? (
                 <TanstackTable items={allItems} />
             ) : (
                 <NativeTable items={allItems} />

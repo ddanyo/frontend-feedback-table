@@ -2,12 +2,13 @@ import { useEffect } from 'react';
 import { useStore, useZustandStore } from '@store';
 import { PaginatedTable } from '@components';
 import { pollingInterval } from '@constants';
+import { useAddressBar } from '@hooks';
 
 export function PaginatedTableZustand() {
     console.log('PaginatedTableZustand');
 
-    const { get: getPageSettings } = useStore.PageSettings();
-    const { page, pageSize } = getPageSettings();
+    const { get } = useStore.Settings();
+    const { urlParams } = useAddressBar(get().zustand);
 
     useZustandStore((state) => state.allItems);
     useZustandStore((state) => state.searchResults);
@@ -26,7 +27,7 @@ export function PaginatedTableZustand() {
         return () => stopPolling();
     }, [startPolling, stopPolling]);
 
-    const { items, totalPages } = getPage(page, pageSize);
+    const { items, totalPages } = getPage(urlParams.page, urlParams.pageSize);
 
     return (
         <PaginatedTable

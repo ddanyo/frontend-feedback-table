@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { buildSearchRegex } from '@/utils/buildSearchRegex';
+import { buildSearchRegex } from '@utils';
 
 export const getHighlightedText = (
     text: string | undefined,

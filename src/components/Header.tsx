@@ -1,66 +1,32 @@
 import { Search, CaseSensitive, WholeWord } from 'lucide-react';
 import { useState } from 'react';
-import { useStore, useZustandStore } from '@store';
-import { useDebounce } from '@hooks';
+import { useStore } from '@store';
+import { useAddressBar, useDebounce } from '@hooks';
 
 export function Header() {
     console.log('Header');
 
-    const { get: getSettings } = useStore.Settings();
-    const {
-        get: getSearchSettings,
-        set: setSearchSettings,
-        update: updateSearchSettings,
-    } = useStore.SearchSettings();
+    const { get } = useStore.Settings();
+    const { urlParams, updateUrl } = useAddressBar(get().zustand);
 
-    const [localSearchterm, setLocalSearchterm] = useState(getSearchSettings().searchTerm);
+    const [localSearchterm, setLocalSearchterm] = useState(urlParams.searchTerm);
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalSearchterm(e.target.value);
     };
 
     useDebounce(() => {
-        console.log('Debounce triggered:', localSearchterm);
-
-        const currentSearch = getSearchSettings();
-
-        if (currentSearch.searchTerm !== localSearchterm) {
-            setSearchSettings({
-                ...currentSearch,
-                searchTerm: localSearchterm,
-            });
-        }
-
-        if (getSettings().zustand) {
-            useZustandStore
-                .getState()
-                .searchLocal(
-                    localSearchterm,
-                    getSearchSettings().caseSensitive,
-                    getSearchSettings().wholeWord
-                );
+        if (urlParams.searchTerm !== localSearchterm) {
+            updateUrl({ searchTerm: localSearchterm, page: 1 });
         }
     }, 300);
 
     function handleSensitiveChange() {
-        updateSearchSettings((prev) => {
-            const newVal = !prev.caseSensitive;
-
-            if (getSettings().zustand) {
-                useZustandStore.getState().searchLocal(localSearchterm, newVal, prev.wholeWord);
-            }
-            return { ...prev, caseSensitive: newVal };
-        });
+        updateUrl({ caseSensitive: !urlParams.caseSensitive, page: 1 });
     }
 
     function handleWholewordChange() {
-        updateSearchSettings((prev) => {
-            const newVal = !prev.wholeWord;
-            if (getSettings().zustand) {
-                useZustandStore.getState().searchLocal(localSearchterm, prev.caseSensitive, newVal);
-            }
-            return { ...prev, wholeWord: newVal };
-        });
+        updateUrl({ wholeWord: !urlParams.wholeWord, page: 1 });
     }
 
     return (
@@ -81,7 +47,7 @@ export function Header() {
 
                     <div className="flex items-center pr-2 gap-1">
                         <button
-                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${getSearchSettings().caseSensitive ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
+                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${urlParams.caseSensitive ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Поиск с учетом регистра"
                             onClick={handleSensitiveChange}
@@ -89,7 +55,7 @@ export function Header() {
                             <CaseSensitive size={20} />
                         </button>
                         <button
-                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${getSearchSettings().wholeWord ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
+                            className={`p-1 hover:bg-slate-200 rounded text-blue-500 ${urlParams.wholeWord ? 'border-blue-400 border-2' : 'border-2 border-slate-100'}`}
                             data-tooltip-id="global-tooltip"
                             data-tooltip-content="Поиск слова целиком"
                             onClick={handleWholewordChange}
