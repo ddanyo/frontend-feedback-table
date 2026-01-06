@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { Settings } from '@interfaces';
+import { parse, stringify } from 'devalue';
+import isEqual from 'fast-deep-equal';
 
 const defaults: {
     settings: Settings;
@@ -29,7 +31,14 @@ function useStoreHook<K extends keyof typeof keys>(
     const [value, setValue] = useState<(typeof defaults)[K]>(() => {
         try {
             const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
+            if (!item) return initialValue;
+
+            try {
+                return parse(item);
+            } catch {
+                console.warn(`Old storage format detected for ${key}, falling back to JSON.parse`);
+                return JSON.parse(item);
+            }
         } catch (error) {
             console.error(`Error reading ${group} from localStorage:`, error);
             return initialValue;
@@ -38,9 +47,11 @@ function useStoreHook<K extends keyof typeof keys>(
 
     useEffect(() => {
         try {
-            const newValueStr = JSON.stringify(value);
-            if (newValueStr !== window.localStorage.getItem(key)) {
-                window.localStorage.setItem(key, newValueStr);
+            const currentRaw = window.localStorage.getItem(key);
+            const currentParsed = currentRaw ? parse(currentRaw) : null;
+
+            if (!isEqual(value, currentParsed)) {
+                window.localStorage.setItem(key, stringify(value));
 
                 window.dispatchEvent(
                     new CustomEvent(`localstorage-update-${key}`, { detail: value })
@@ -53,12 +64,14 @@ function useStoreHook<K extends keyof typeof keys>(
 
     useEffect(() => {
         const handleStoreChange = (e: StorageEvent) => {
-            if (e.key === key && e.newValue && e.newValue !== JSON.stringify(value)) {
+            if (e.key === key && e.newValue) {
                 try {
-                    const parsed = JSON.parse(e.newValue);
-                    setValue(parsed);
+                    const parsed = parse(e.newValue);
+                    if (!isEqual(parsed, value)) {
+                        setValue(parsed);
+                    }
                 } catch (error) {
-                    console.error(`Error parsing ${group} from storage event:`, error);
+                    console.error(`Error parsing storage event:`, error);
                 }
             }
         };
@@ -69,7 +82,7 @@ function useStoreHook<K extends keyof typeof keys>(
 
     useEffect(() => {
         const handleCustomUpdate = (e: CustomEvent<(typeof defaults)[K]>) => {
-            if (JSON.stringify(e.detail) !== JSON.stringify(value)) {
+            if (!isEqual(e.detail, value)) {
                 setValue(e.detail);
             }
         };
