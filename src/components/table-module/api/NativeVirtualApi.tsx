@@ -14,7 +14,7 @@ export function NativeVirtualApi() {
     const [localPage, setLocalPage] = useState(1);
     const { urlParams } = useAddressBar(get().zustand);
 
-    const { searchTerm, caseSensitive, wholeWord, sortBy, pageSize, page } = urlParams;
+    const { searchTerm, caseSensitive, wholeWord, sortBy, pageSize } = urlParams;
     const queryParams = useMemo(
         () => ({
             skip: (localPage - 1) * pageSize,
@@ -40,19 +40,19 @@ export function NativeVirtualApi() {
     useEffect(() => {
         setLocalPage(1);
         setAllItems([]);
-    }, [urlParams]);
+    }, [searchTerm, caseSensitive, wholeWord, sortBy, pageSize]);
 
     useEffect(() => {
         if (!data?.items || data.items.length === 0) return;
 
         setAllItems((prevItems) => {
-            if (page === 1) {
+            if (localPage === 1) {
                 return data.items;
             }
 
             return [...prevItems, ...data.items];
         });
-    }, [data, page]);
+    }, [data, localPage]);
 
     const observerTarget = useRef<HTMLDivElement>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -81,7 +81,7 @@ export function NativeVirtualApi() {
         return () => {
             observer.disconnect();
         };
-    }, [isFetching, isLastPage, error, allItems.length, page]);
+    }, [isFetching, isLastPage, error, allItems.length]);
 
     if (isLoading && localPage === 1 && allItems.length === 0)
         return (
