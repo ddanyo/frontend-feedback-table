@@ -5,7 +5,7 @@ export async function getFeedbacks(
     params: GetFeedbacksParams,
     signal?: AbortSignal
 ): Promise<FeedbackResponse> {
-    const res = await axios.get('http://localhost:2510/api', {
+    const res = await axios.get('/api', {
         params,
         signal,
     });

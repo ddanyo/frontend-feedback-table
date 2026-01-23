@@ -22,7 +22,7 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true,
         /*Aliases*/
-        "ignoreDeprecations": "6.0",
+        // "ignoreDeprecations": "6.0",
         "baseUrl": ".",
         "paths": {
             "@components": ["src/components"],
