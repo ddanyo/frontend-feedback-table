@@ -22,19 +22,17 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true,
         /*Aliases*/
-        "ignoreDeprecations": "6.0",
-        "baseUrl": ".",
         "paths": {
-            "@components": ["src/components"],
-            "@components/*": ["src/components/*"],
-            "@hooks": ["src/hooks"],
-            "@assets/*": ["src/assets/*"],
-            "@api": ["src/api"],
-            "@constants": ["src/constants"],
-            "@interfaces": ["src/interfaces"],
-            "@store": ["src/store"],
-            "@utils": ["src/utils"],
-            "@/*": ["src/*"]
+            "@components": ["./src/components"],
+            "@components/*": ["./src/components/*"],
+            "@hooks": ["./src/hooks"],
+            "@assets/*": ["./src/assets/*"],
+            "@api": ["./src/api"],
+            "@constants": ["./src/constants"],
+            "@interfaces": ["./src/interfaces"],
+            "@store": ["./src/store"],
+            "@utils": ["./src/utils"],
+            "@/*": ["./src/*"]
         }
     },
     "include": ["src"]
