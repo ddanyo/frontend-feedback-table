@@ -11,4 +11,5 @@ services:
 
 networks:
     feedback-system-network:
+        external: true
         name: feedback-system-network
