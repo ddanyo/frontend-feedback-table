@@ -1,7 +1,7 @@
 import { create } from 'zustand';
-import { type Feedback } from '../interfaces/Feedback';
-import { getFeedbacks } from '../api/feedbacks';
-import { buildSearchRegex } from '../utils/searchRegex';
+import { type Feedback } from '@interfaces';
+import { getFeedbacks } from '@api';
+import { buildSearchRegex } from '@utils';
 
 type State = {
     allItems: Feedback[];
@@ -25,7 +25,7 @@ type State = {
 };
 
 console.log('useAppStore');
-const useZustandStore = create<State>((set, get) => ({
+export const useZustandStore = create<State>((set, get) => ({
     allItems: [],
     searchResults: [],
     isSearching: false,
@@ -129,5 +129,3 @@ const useZustandStore = create<State>((set, get) => ({
         });
     },
 }));
-
-export default useZustandStore;

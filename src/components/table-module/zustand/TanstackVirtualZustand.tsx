@@ -1,10 +1,7 @@
 import { useMemo, useRef } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import useZustandStore from '../../../store/useZustandStore';
-
-import { NativeTable } from '../NativeTable';
-import { useStore } from '../../../store/useStore';
-import { TanstackTable } from '../TanstackTable';
+import { useZustandStore, useStore } from '@store';
+import { NativeTable, TanstackTable } from '@components';
 
 export function TanstackVirtualZustand() {
     console.log('TanstackVirtualZustand');

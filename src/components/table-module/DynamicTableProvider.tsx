@@ -1,6 +1,5 @@
-import { useStore } from '../../store/useStore';
-import { DynamicTableZustand } from './zustand/DynamicTableZustand';
-import { DynamicTableApi } from './api/DynamicTableApi';
+import { useStore } from '@store';
+import { DynamicTableZustand, DynamicTableApi } from '@components';
 
 export function DynamicTableProvider() {
     const { get } = useStore.Settings();

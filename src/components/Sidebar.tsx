@@ -1,21 +1,16 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Switcher } from './Switcher';
+import { useEffect, useState } from 'react';
+import { Switcher } from '@components';
 import { Settings, X, Menu, Plus, Minus, RefreshCw } from 'lucide-react';
-import useZustandStore from '../store/useZustandStore';
-import { useStore } from '../store/useStore';
+import { useStore, useZustandStore } from '@store';
+import { useAddressBar } from '@hooks';
 
 export function Sidebar() {
     console.log('Sidebar');
 
-    const {
-        get: getPageSettings,
-        set: setPageSettings,
-        update: updatePageSettings,
-    } = useStore.PageSettings();
     const { get: getSettings, set: setSettings, update: updateSettings } = useStore.Settings();
+    const { urlParams, updateUrl } = useAddressBar(getSettings().zustand);
 
-    const pageSize = useMemo(() => getPageSettings().pageSize, [getPageSettings]);
-    const [localPageSize, setLocalPageSize] = useState<string>(pageSize.toString());
+    const [localPageSize, setLocalPageSize] = useState<string>(urlParams.pageSize.toString());
 
     const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -32,33 +27,18 @@ export function Sidebar() {
     };
 
     useEffect(() => {
-        setLocalPageSize(pageSize.toString());
-    }, [pageSize]);
+        setLocalPageSize(urlParams.pageSize.toString());
+    }, [urlParams.pageSize]);
     const [isOpen, setIsOpen] = useState(false);
 
     function handleDecreasePageSize() {
-        const current = getPageSettings();
-        if (current.pageSize >= 10) {
-            updatePageSettings((prev) => ({
-                ...prev,
-                pageSize: prev.pageSize - 5,
-            }));
-        }
-        if (current.pageSize - 5 < 5) {
-            setPageSettings({ ...current, pageSize: 5 });
-        }
+        const newSize = Math.max(5, urlParams.pageSize - 5);
+        updateUrl({ pageSize: newSize, page: 1 });
     }
+
     function handleIncreasePageSize() {
-        const current = getPageSettings();
-        if (current.pageSize <= 95) {
-            updatePageSettings((prev) => ({
-                ...current,
-                pageSize: prev.pageSize + 5,
-            }));
-        }
-        if (current.pageSize + 5 > 100) {
-            setPageSettings({ ...current, pageSize: 100 });
-        }
+        const newSize = Math.min(100, urlParams.pageSize + 5);
+        updateUrl({ pageSize: newSize, page: 1 });
     }
 
     const handlePageSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,19 +46,16 @@ export function Sidebar() {
     };
 
     const handlePageSizeBlur = () => {
-        const current = getPageSettings();
         let numVal = parseInt(localPageSize, 10);
         if (isNaN(numVal) || numVal < 5) {
-            setLocalPageSize(current.pageSize.toString());
+            setLocalPageSize(urlParams.pageSize.toString());
             return;
         }
         if (numVal > 100) {
             numVal = 100;
         }
-        if (numVal !== current.pageSize) {
-            setPageSettings({ ...current, pageSize: numVal });
-        }
-        setLocalPageSize(numVal.toString());
+        numVal = Math.min(numVal, 100);
+        updateUrl({ pageSize: numVal, page: 1 });
     };
 
     return (
@@ -266,7 +243,7 @@ export function Sidebar() {
                             <div className="flex items-center justify-center gap-2 bg-none h-1/2 rounded-lg">
                                 <button
                                     onClick={handleDecreasePageSize}
-                                    disabled={getPageSettings().pageSize === 5}
+                                    disabled={urlParams.pageSize === 5}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Minus className="w-6 h-6" strokeWidth={2.5} />
@@ -288,7 +265,7 @@ export function Sidebar() {
                                 />
                                 <button
                                     onClick={handleIncreasePageSize}
-                                    disabled={getPageSettings().pageSize === 100}
+                                    disabled={urlParams.pageSize === 100}
                                     className="flex items-center justify-center text-blue-500 p-1 hover:bg-slate-200 rounded-md transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     <Plus className="w-6 h-6" strokeWidth={2.5} />

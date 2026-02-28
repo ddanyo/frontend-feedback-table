@@ -1,7 +1,7 @@
 services:
     nginx:
-        container_name: fs-table-container
-        image: fs-table:0.0.1
+        container_name: fs-table
+        image: fs-table-image
         build:
             context: .
             dockerfile: Dockerfile
@@ -12,3 +12,4 @@ services:
 networks:
     feedback-system-network:
         external: true
+        name: feedback-system-network

@@ -1,6 +1,5 @@
-import { useStore } from '../../../store/useStore';
-import { NativeVirtualApi } from './NativeVirtualApi';
-import { TanstackVirtualApi } from './TanstackVirtualApi';
+import { useStore } from '@store';
+import { NativeVirtualApi, TanstackVirtualApi } from '@components';
 
 export function DynamicTableApi() {
     const { get } = useStore.Settings();

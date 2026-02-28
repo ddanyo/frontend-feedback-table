@@ -1,62 +1,48 @@
 import { useEffect, useState } from 'react';
-import { ChevronsLeft, ChevronsRight } from 'lucide-react'; // npm install @ant-design/icons@6.1.2 --save
-import { useStore } from '../store/useStore';
+import { ChevronsLeft, ChevronsRight } from 'lucide-react';
+import { useStore } from '@store';
+import { useAddressBar } from '@hooks';
 
 export function PageSwitcher({ countPages }: { countPages: number }) {
     console.log('PageSwitcher');
 
-    const {
-        get: getPageSettings,
-        set: setPageSettings,
-        update: updatePageSettings,
-    } = useStore.PageSettings();
-    const [localPage, setLocalPage] = useState<string>(getPageSettings().page.toString());
+    const { get: getSettings } = useStore.Settings();
+    const { urlParams, updateUrl } = useAddressBar(getSettings().zustand);
+    const [localPage, setLocalPage] = useState<string>(urlParams.page.toString());
 
     useEffect(() => {
-        setLocalPage(getPageSettings().page.toString());
-    }, [getPageSettings]);
+        setLocalPage(urlParams.page.toString());
+    }, [urlParams.page]);
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalPage(e.target.value);
     };
 
     const commitPageChange = () => {
-        const current = getPageSettings();
-        let numVal = parseInt(localPage, 10);
+        const numVal = parseInt(localPage, 10);
 
         if (isNaN(numVal) || numVal < 1) {
-            setLocalPage(current.page.toString());
+            setLocalPage(urlParams.page.toString());
             return;
         }
 
-        if (numVal > countPages) {
-            numVal = countPages;
-        }
-
-        setLocalPage(numVal.toString());
-
-        setPageSettings({ ...current, page: numVal });
+        const targetPage = Math.min(numVal, countPages);
+        updateUrl({ page: targetPage });
     };
 
     function handlePrevPage() {
-        updatePageSettings((prev) => ({
-            ...prev,
-            page: Math.max(1, prev.page - 1),
-        }));
+        updateUrl({ page: Math.max(1, urlParams.page - 1) });
     }
 
     function handleNextPage() {
-        updatePageSettings((prev) => ({
-            ...prev,
-            page: Math.min(countPages, prev.page + 1),
-        }));
+        updateUrl({ page: Math.min(countPages, urlParams.page + 1) });
     }
 
     return (
         <div className="flex items-center justify-center gap-3 bg-none h-1/2 w-full rounded-lg">
             <button
                 onClick={handlePrevPage}
-                disabled={getPageSettings().page === 1}
+                disabled={urlParams.page === 1}
                 className="flex items-center justify-center text-blue-500 text-2xl bg-none w-8 h-8 rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition hover:bg-slate-200"
             >
                 <ChevronsLeft size={25} strokeWidth={2.5} />
@@ -79,7 +65,7 @@ export function PageSwitcher({ countPages }: { countPages: number }) {
             <button
                 className="flex items-center justify-center text-blue-500 text-3xl bg-none w-8 h-8 rounded-md cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed transition hover:bg-slate-200"
                 onClick={handleNextPage}
-                disabled={getPageSettings().page === countPages}
+                disabled={urlParams.page === countPages}
             >
                 <ChevronsRight size={25} strokeWidth={2.5} />
             </button>

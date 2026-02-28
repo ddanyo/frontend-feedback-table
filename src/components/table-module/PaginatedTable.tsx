@@ -1,8 +1,6 @@
-import { NativeTable } from './NativeTable';
-import { TanstackTable } from './TanstackTable';
-import { PageSwitcher } from '../PageSwitcher';
-import { useStore } from '../../store/useStore';
-import type { Feedback } from '../../interfaces/Feedback';
+import { NativeTable, TanstackTable, PageSwitcher } from '@components';
+import { useStore } from '@store';
+import type { Feedback } from '@interfaces';
 
 export function PaginatedTable({
     items,

@@ -1,27 +1,27 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useMemo } from 'react';
-import { getFeedbacks } from '../../../api/feedbacks';
-import { FeedbackSort } from '../../../constans/FeedbackSort';
-import { type FeedbackResponse } from '../../../interfaces/Feedback';
-import { useStore } from '../../../store/useStore';
-import { PaginatedTable } from '../PaginatedTable';
+import { getFeedbacks } from '@api';
+import { type FeedbackResponse } from '@interfaces';
+import { useStore } from '@store';
+import { PaginatedTable } from '@components';
+import { useAddressBar } from '@hooks';
 
 export function PaginatedTableApi() {
     console.log('PaginatedTable');
 
-    const { get: getPageSettings } = useStore.PageSettings();
-    const { get: getSearchSettings } = useStore.SearchSettings();
+    const { get } = useStore.Settings();
+    const { urlParams } = useAddressBar(get().zustand);
 
     const queryParams = useMemo(
         () => ({
-            skip: (getPageSettings().page - 1) * getPageSettings().pageSize,
-            take: getPageSettings().pageSize,
-            search: getSearchSettings().searchTerm,
-            sortBy: FeedbackSort.NEWEST,
-            caseSensitive: getSearchSettings().caseSensitive,
-            wholeWord: getSearchSettings().wholeWord,
+            skip: (urlParams.page - 1) * urlParams.pageSize,
+            take: urlParams.pageSize,
+            search: urlParams.searchTerm,
+            sortBy: urlParams.sortBy,
+            caseSensitive: urlParams.caseSensitive,
+            wholeWord: urlParams.wholeWord,
         }),
-        [getPageSettings, getSearchSettings]
+        [urlParams]
     );
 
     const getFeedbacksQuery = useQuery<FeedbackResponse, Error>({

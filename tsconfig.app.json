@@ -20,7 +20,20 @@
         "noUnusedParameters": true,
         "erasableSyntaxOnly": true,
         "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "noUncheckedSideEffectImports": true,
+        /*Aliases*/
+        "paths": {
+            "@components": ["./src/components"],
+            "@components/*": ["./src/components/*"],
+            "@hooks": ["./src/hooks"],
+            "@assets/*": ["./src/assets/*"],
+            "@api": ["./src/api"],
+            "@constants": ["./src/constants"],
+            "@interfaces": ["./src/interfaces"],
+            "@store": ["./src/store"],
+            "@utils": ["./src/utils"],
+            "@/*": ["./src/*"]
+        }
     },
     "include": ["src"]
 }
